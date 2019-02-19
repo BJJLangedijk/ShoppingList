@@ -1,5 +1,10 @@
 <template>
-    <v-btn color="primary" @click="login">LOGIN</v-btn>
+    <div>
+        <img src="/img/google.svg" alt="Login with Google">
+        <h3>Please sign in with your Google account</h3>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="login">Sign in</v-btn>
+    </div>
 </template>
 <script lang="ts">
 import firebase from 'firebase/app';
@@ -21,3 +26,18 @@ export default {
     }
 };
 </script>
+
+<style lang="scss" scoped>
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    img {
+        margin: 20px 0;
+        flex-basis: 25vh;
+    }
+    .v-btn {
+        margin: 20px 0;
+    }
+</style>
