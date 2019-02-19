@@ -1,25 +1,50 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import List from '@/components/List.vue';
+import Item from '@/components/dialogs/Item.vue';
+import Auth from '@/components/Auth.vue';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 Vue.use(Router);
 
-export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: Home,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
-    },
-  ],
+const router = new Router({
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes: [
+        {
+            path: '/login',
+            name: 'Auth',
+            component: Auth,
+        },
+        {
+            path: '/',
+            name: 'List',
+            component: List,
+            children: [
+                {path: '/add', component: Item, name: 'addItem'},
+                {path: '/edit/section/:sectionId/item/:itemId', component: Item, name: 'editItem'}
+            ],
+            meta: {
+                requiresAuth: true
+            },
+        },
+    ],
 });
+
+// router.beforeEach((to, from, next) => {
+//   const currentUser = firebase.auth().currentUser;
+//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+//   console.log(currentUser, requiresAuth)
+
+//   if (requiresAuth && !currentUser) {
+//       next({name: 'Auth'});
+//   } else if (!requiresAuth && currentUser) {
+//       next({name: 'Overview'});
+//   } else {
+//       next();
+//   }
+// });
+
+export default router;
