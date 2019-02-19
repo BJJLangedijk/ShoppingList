@@ -25,7 +25,7 @@ import Vue from 'vue';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
-export default  Vue.extend({
+export default Vue.extend({
     name: 'App',
     data: () => ({
         settings: {

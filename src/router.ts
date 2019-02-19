@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import List from '@/components/List.vue';
-import Item from '@/components/dialogs/Item.vue';
-import Auth from '@/components/Auth.vue';
+const List = () => import('@/components/List.vue');
+const Item = () => import('@/components/dialogs/Item.vue');
+const Auth = () => import('@/components/Auth.vue');
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
@@ -32,19 +32,15 @@ const router = new Router({
     ],
 });
 
-// router.beforeEach((to, from, next) => {
-//   const currentUser = firebase.auth().currentUser;
-//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+router.beforeEach((to, from, next) => {
+  const currentUser = firebase.auth().currentUser;
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-//   console.log(currentUser, requiresAuth)
-
-//   if (requiresAuth && !currentUser) {
-//       next({name: 'Auth'});
-//   } else if (!requiresAuth && currentUser) {
-//       next({name: 'Overview'});
-//   } else {
-//       next();
-//   }
-// });
+  if (requiresAuth && !currentUser) {
+      next({name: 'Auth'});
+  } else {
+      next();
+  }
+});
 
 export default router;

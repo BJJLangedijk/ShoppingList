@@ -2,7 +2,6 @@
     <v-btn color="primary" @click="login">LOGIN</v-btn>
 </template>
 <script lang="ts">
-import Vue from 'vue';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
