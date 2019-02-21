@@ -87,7 +87,7 @@
 
 
                 this.getRef(this.section.id, this.item.id).set(this.item).then(() => {
-                    if (this.initialSectionId) {
+                    if (this.initialSectionId !== this.section.id) {
                         this.getRef(this.initialSectionId, this.item.id).remove().then(
                             this.closeDialog
                         );
