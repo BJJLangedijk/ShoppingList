@@ -102,9 +102,15 @@
                         this.selectedItems[item.id] = itemData;
                     }
                 } else {
-                    firebase.firestore().collection('items').doc(item.id).update({
-                        checked: item.checked
-                    }).catch(this.onFirebaseError);
+                    if (item.checked) {
+                        firebase.firestore().collection('items').doc(item.id).update({
+                            checked: item.checked
+                        }).catch(this.onFirebaseError);
+                    } else {
+                        firebase.firestore().collection('items').doc(item.id).update({
+                            checked: firebase.firestore.FieldValue.delete()
+                        }).catch(this.onFirebaseError);
+                    }
                 }
             },
             getSections(): void {
