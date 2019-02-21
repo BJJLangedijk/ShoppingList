@@ -5,11 +5,17 @@ import router from './router';
 import store from './store';
 import './registerServiceWorker';
 import firebase from 'firebase/app';
+import 'firebase/firestore';
 import longpress from './directives/long-press';
 
 Vue.use(longpress, { duration: 500 });
 
 Vue.config.productionTip = false;
+
+firebase.firestore().enablePersistence()
+  .catch(function(err) {
+    console.log('Couldn\'t enable persistent storage', err);
+  });
 
 new Vue({
   router,

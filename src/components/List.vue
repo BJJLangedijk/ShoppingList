@@ -2,11 +2,11 @@
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
-            <div :key="section.id" v-if="section.items">
+            <div :key="section.id">
                 <v-divider></v-divider>
                 <v-subheader>{{section.value}}</v-subheader>
 
-                <template v-for="item in section.items">
+                <template v-for="item in getItemsBySectionId(section.id)">
                     <v-list-tile :key="item.id" v-if="settings.editMode || settings.completed || !item.checked">
                         <v-list-tile-action>
                             <template v-if="settings.editMode">
@@ -49,9 +49,8 @@
 
 <script lang='ts'>
     import Vue from 'vue';
-    import _ from 'lodash';
     import firebase, { FirebaseError } from 'firebase/app';
-    import 'firebase/database';
+    import 'firebase/firestore';
 
     interface Item {
         sectionId: string;
@@ -64,7 +63,6 @@
 
     interface Section {
         id: string;
-        items: Item[];
         value: string;
     }
 
@@ -76,7 +74,8 @@
             },
             loading: true,
             sections: [] as Section[],
-            selectedItems: [] as any
+            items: [] as Item[],
+            selectedItems: [] as any,
         }),
         methods: {
             onFirebaseError(err: FirebaseError): void {
@@ -103,41 +102,47 @@
                         this.selectedItems[item.id] = itemData;
                     }
                 } else {
-                    firebase.database().ref('sections/' + section.id + '/items/' + item.id).set(item).catch(this.onFirebaseError);
+                    firebase.firestore().collection('items').doc(item.id).update({
+                        checked: item.checked
+                    }).catch(this.onFirebaseError);
                 }
             },
-            getItems(): void {
-                if (navigator.onLine) {
-                    this.loading = true;
-                    firebase.database().ref('sections').on('value', (sectionData: any) => {
-                        this.sections = sectionData.val() || [];
-                        this.selectedItems = [];
-
-                        for (const section in this.sections) {
-                            if (this.sections.hasOwnProperty(section)) {
-                                const sectionData = this.sections[section];
-
-                                sectionData.items = _.orderBy(sectionData.items, 'value', 'asc');
-
-                                for (const item in sectionData.items) {
-                                    if (sectionData.items.hasOwnProperty(item)) {
-                                        const itemData: Item = Object.assign({}, sectionData.items[item]);
-
-                                        if (itemData.checked) {
-                                            itemData.sectionId = sectionData.id;
-                                            // this.selectedItems.push(itemData);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        localStorage.setItem('sections', JSON.stringify(this.sections));
-                        this.loading = false;
-                    }, this.onFirebaseError);
-                } else if (localStorage.getItem('sections')) {
-                    this.sections = JSON.parse(localStorage.getItem('sections') || '');
+            getSections(): void {
+                this.loading = true;
+                firebase.firestore().collection('sections').orderBy('value').onSnapshot((collection) => {
+                    this.sections = [];
+                    collection.forEach((doc) => {
+                        this.sections.push({
+                            id: doc.id,
+                            value: doc.data().value,
+                        });
+                    });
                     this.loading = false;
-                }
+                }, (err) => {
+                    console.error('Something went wrong', err);
+                });
+            },
+            getItems(): void {
+                this.loading = true;
+                firebase.firestore().collection('items').orderBy('value').onSnapshot((collection) => {
+                    this.items = [];
+                    collection.forEach((doc) => {
+                        this.items.push({
+                            sectionId: doc.data().sectionId,
+                            amount: doc.data().amount,
+                            id: doc.id,
+                            value: doc.data().value,
+                            checked: doc.data().checked,
+                            markedForDeletion: doc.data().markedForDeletion
+                        });
+                    });
+                    this.loading = false;
+                }, (err) => {
+                    console.error('Something went wrong', err);
+                });
+            },
+            getItemsBySectionId(sectionId: string) {
+                return this.items.filter(item => item.sectionId === sectionId);
             },
             editItem(item: Item, section: Section) {
                 this.$router.push({ name: 'editItem', params: { sectionId: section.id, itemId: item.id }});
@@ -147,7 +152,7 @@
                     if (this.selectedItems.hasOwnProperty(key)) {
                         const item = this.selectedItems[key];
 
-                        firebase.database().ref('sections/' + item.sectionId + '/items/' + item.id).remove().catch(this.onFirebaseError);
+                        firebase.firestore().collection('items').doc(item.id).delete().catch(this.onFirebaseError);
                     }
                 }
             }
@@ -173,6 +178,7 @@
                 editMode: this.$store.state.settings.editMode,
                 completed: this.$store.state.settings.completed
             };
+            this.getSections();
             this.getItems();
         }
     });
