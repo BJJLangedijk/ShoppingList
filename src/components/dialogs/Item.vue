@@ -12,7 +12,7 @@
                 <v-card-text>
                     <v-form v-model="validForm">
                         <v-autocomplete required clearable autofocus
-                            label="Section"
+                            label="Section *"
                             v-model="section.id"
                             :rules="notEmptyRule"
                             :items="sections"
@@ -21,16 +21,15 @@
                         </v-autocomplete>
 
                         <v-text-field required
-                            label="Item"
+                            label="Item *"
                             v-model="item.value"
                             :rules="notEmptyRule"
                             placeholder="Enter the item you want to add">
                         </v-text-field>
 
-                        <v-text-field required
+                        <v-text-field
                             label="Amount"
                             v-model="item.amount"
-                            :rules="notEmptyRule"
                             placeholder="Enter an amount">
                         </v-text-field>
                     </v-form>
