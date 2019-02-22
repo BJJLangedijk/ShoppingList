@@ -1,5 +1,7 @@
 <template>
+    <div>
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
+
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
             <div :key="section.id">
@@ -45,6 +47,22 @@
         </template>
         <router-view></router-view>
     </v-list>
+    <v-snackbar v-model="noConnectionSnackbar" :timeout=0 :multi-line=true>
+        <v-icon dark large class='mr-4'>cloud_off</v-icon>
+        <div class="text-xs-center">
+            <span>You don't seem to have internet!</span>
+            <br />
+            <span>Using cached results</span>
+        </div>
+        <v-btn
+            color="primary"
+            flat
+            @click="noConnectionSnackbar = false"
+        >
+            Close
+        </v-btn>
+    </v-snackbar>
+    </div>
 </template>
 
 <script lang='ts'>
@@ -72,6 +90,7 @@
                 editMode: false,
                 completed: false
             },
+            noConnectionSnackbar: !navigator.onLine,
             loading: true,
             sections: [] as Section[],
             items: [] as Item[],
@@ -186,6 +205,14 @@
             };
             this.getSections();
             this.getItems();
+
+            window.addEventListener('online', () => {
+                this.noConnectionSnackbar = false;
+            });
+
+            window.addEventListener('offline', () => {
+                this.noConnectionSnackbar = true;
+            });
         }
     });
 </script>
