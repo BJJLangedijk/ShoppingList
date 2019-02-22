@@ -191,10 +191,10 @@
             }
         },
         watch: {
-            editMode(state) {
+            editMode(state: boolean) {
                 this.settings.editMode = state;
             },
-            completedItems(state) {
+            completedItems(state: boolean) {
                 this.settings.completed = state;
             }
         },
