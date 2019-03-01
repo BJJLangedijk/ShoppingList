@@ -16,7 +16,7 @@
 
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
-            <div :key="section.id">
+            <div v-if="getItemsBySectionId(section.id).length" :key="section.id">
                 <v-divider></v-divider>
                 <v-subheader>{{section.value}}</v-subheader>
 
