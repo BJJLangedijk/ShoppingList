@@ -1,6 +1,18 @@
 <template>
     <div>
+        <v-text-field
+        clearable
+        v-model="searchQuery"
+        prepend-icon="search"
+        @input="filterResults"
+        placeholder="Search for an item"
+        class="p2"
+        ></v-text-field>
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
+
+    <div v-else-if="searchQuery && !filteredItems.length" class="subheading text-xs-center">
+        Could not find any items
+    </div>
 
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
@@ -104,6 +116,13 @@
                     console.log(err);
                 }
             },
+            filterResults(): void {
+                if (!this.searchQuery) {
+                    this.filteredItems = [];
+                } else {
+                    this.filteredItems = this.items.filter(item => item.value.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                }
+            },
             toggleEditMode(): void {
                 this.$store.commit('toggleEditMode');
             },
@@ -167,7 +186,14 @@
                 });
             },
             getItemsBySectionId(sectionId: string) {
-                return this.items.filter(item => item.sectionId === sectionId);
+                var items = this.searchQuery ? this.filteredItems : this.items;
+
+                return items.filter(item => {
+                    if (this.searchQuery && !(this.settings.editMode || this.settings.completed)) {
+                        return item.sectionId === sectionId && !item.checked;
+                    }
+                    return item.sectionId === sectionId
+                });
             },
             editItem(item: Item, section: Section) {
                 this.$router.push({ name: 'editItem', params: { sectionId: section.id, itemId: item.id }});
@@ -219,6 +245,10 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='scss'>
+    .v-input {
+        padding-left: 2%;
+        padding-right: 2%;
+    }
     .v-list {
         display: flex;
         flex-flow: row wrap;
