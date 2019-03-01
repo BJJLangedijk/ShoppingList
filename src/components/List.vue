@@ -103,10 +103,12 @@
                 completed: false
             },
             noConnectionSnackbar: !navigator.onLine,
-            loading: true,
+            searchQuery: '' as string,
+            loading: true as boolean,
             sections: [] as Section[],
+            filteredItems: [] as Item[],
             items: [] as Item[],
-            selectedItems: [] as any,
+            selectedItems: [] as Item[],
         }),
         methods: {
             onFirebaseError(err: FirebaseError): void {
