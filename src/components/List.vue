@@ -38,27 +38,27 @@
                 </template>
             </div>
         </template>
-
-
-        <template v-if="settings.editMode && Object.keys(selectedItems).length">
-
-            <!-- Delete Button -->
-            <v-btn fab color="primary" @click="deleteItems()">
-                <v-icon>delete</v-icon>
-            </v-btn>
-        </template>
-
-        <template v-if="!settings.editMode">
-
-            <!-- Add Button -->
-            <router-link :to="{name: 'addItem'}">
-                <v-btn fab color="primary">
-                    <v-icon>add</v-icon>
-                </v-btn>
-            </router-link>
-        </template>
-        <router-view></router-view>
     </v-list>
+    <template v-if="settings.editMode && Object.keys(selectedItems).length">
+
+        <!-- Delete Button -->
+        <v-btn fab color="primary" @click="deleteItems()">
+            <v-icon>delete</v-icon>
+        </v-btn>
+    </template>
+
+    <template v-if="!settings.editMode">
+
+        <!-- Add Button -->
+        <router-link :to="{name: 'addItem'}">
+            <v-btn fab color="primary">
+                <v-icon>add</v-icon>
+            </v-btn>
+        </router-link>
+    </template>
+
+    <router-view></router-view>
+
     <v-snackbar v-model="noConnectionSnackbar" :timeout=0 :multi-line=true>
         <v-icon dark large class='mr-4'>cloud_off</v-icon>
         <div class="text-xs-center">
