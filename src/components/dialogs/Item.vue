@@ -11,7 +11,7 @@
 
                 <v-card-text>
                     <v-form v-model="validForm">
-                        <v-autocomplete required clearable autofocus
+                        <v-autocomplete required clearable
                             label="Section *"
                             v-model="section.id"
                             :rules="notEmptyRule"
