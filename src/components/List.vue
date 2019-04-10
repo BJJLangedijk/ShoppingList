@@ -80,6 +80,7 @@
 <script lang='ts'>
     import Vue from 'vue';
     import firebase, { FirebaseError } from 'firebase/app';
+    import { LongPressDirective } from '../directives/long-press';
     import 'firebase/firestore';
 
     interface Item {
@@ -110,6 +111,9 @@
             items: [] as Item[],
             selectedItems: [] as Item[],
         }),
+        directives: {
+            LongPressDirective
+        },
         methods: {
             onFirebaseError(err: FirebaseError): void {
                 if (err.code === 'PERMISSION_DENIED') {
