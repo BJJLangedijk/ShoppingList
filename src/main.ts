@@ -1,8 +1,13 @@
 import Vue from 'vue';
-import App from './App.vue';
+import './plugins/vuetify';
+const App = () => import('./App.vue');
 import router from './router';
 import store from './store';
 import './registerServiceWorker';
+import firebase from 'firebase/app';
+import longpress from './directives/long-press';
+
+Vue.use(longpress, { duration: 500 });
 
 Vue.config.productionTip = false;
 
