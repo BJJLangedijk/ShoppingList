@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-toolbar fixed app dark :color="`${toolbarBackground}`" >
+        <v-toolbar fixed app dark :color="settings.editMode ? '': 'primary'" >
             <v-toolbar-title>Shopping List</v-toolbar-title>
 
             <v-spacer></v-spacer>
@@ -43,8 +43,11 @@ export default Vue.extend({
         }
     },
     computed: {
-        toolbarBackground(): string {
-            return this.settings.editMode ? '' : 'primary';
+        editMode(): any {
+            return this.$store.state.settings.editMode;
+        },
+        completedItems(): any {
+            return this.$store.state.settings.completed;
         }
     },
     watch: {

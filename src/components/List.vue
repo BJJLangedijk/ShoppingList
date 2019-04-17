@@ -1,12 +1,26 @@
 <template>
+    <div>
+        <v-text-field
+        clearable
+        v-model="searchQuery"
+        prepend-icon="search"
+        @input="filterResults"
+        placeholder="Search for an item"
+        class="p2"
+        ></v-text-field>
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
+
+    <div v-else-if="searchQuery && !filteredItems.length" class="subheading text-xs-center">
+        Could not find any items
+    </div>
+
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
-            <div :key="section.id" v-if="section.items">
+            <div v-if="getItemsBySectionId(section.id).length" :key="section.id">
                 <v-divider></v-divider>
                 <v-subheader>{{section.value}}</v-subheader>
 
-                <template v-for="item in section.items">
+                <template v-for="item in getItemsBySectionId(section.id)">
                     <v-list-tile :key="item.id" v-if="settings.editMode || settings.completed || !item.checked">
                         <v-list-tile-action>
                             <template v-if="settings.editMode">
@@ -24,34 +38,50 @@
                 </template>
             </div>
         </template>
-
-
-        <template v-if="settings.editMode && Object.keys(selectedItems).length">
-
-            <!-- Delete Button -->
-            <v-btn fab color="primary" @click="deleteItems()">
-                <v-icon>delete</v-icon>
-            </v-btn>
-        </template>
-
-        <template v-if="!settings.editMode">
-
-            <!-- Add Button -->
-            <router-link :to="{name: 'addItem'}">
-                <v-btn fab color="primary">
-                    <v-icon>add</v-icon>
-                </v-btn>
-            </router-link>
-        </template>
-        <router-view></router-view>
     </v-list>
+    <template v-if="settings.editMode && Object.keys(selectedItems).length">
+
+        <!-- Delete Button -->
+        <v-btn fab color="primary" @click="deleteItems()">
+            <v-icon>delete</v-icon>
+        </v-btn>
+    </template>
+
+    <template v-if="!settings.editMode">
+
+        <!-- Add Button -->
+        <router-link :to="{name: 'addItem'}">
+            <v-btn fab color="primary">
+                <v-icon>add</v-icon>
+            </v-btn>
+        </router-link>
+    </template>
+
+    <router-view></router-view>
+
+    <v-snackbar v-model="noConnectionSnackbar" :timeout=0 :multi-line=true>
+        <v-icon dark large class='mr-4'>cloud_off</v-icon>
+        <div class="text-xs-center">
+            <span>You don't seem to have internet!</span>
+            <br />
+            <span>Using cached results</span>
+        </div>
+        <v-btn
+            color="primary"
+            flat
+            @click="noConnectionSnackbar = false"
+        >
+            Close
+        </v-btn>
+    </v-snackbar>
+    </div>
 </template>
 
 <script lang='ts'>
     import Vue from 'vue';
-    import _ from 'lodash';
     import firebase, { FirebaseError } from 'firebase/app';
-    import 'firebase/database';
+    import { LongPressDirective } from '../directives/long-press';
+    import 'firebase/firestore';
 
     interface Item {
         sectionId: string;
@@ -64,7 +94,6 @@
 
     interface Section {
         id: string;
-        items: Item[];
         value: string;
     }
 
@@ -74,16 +103,30 @@
                 editMode: false,
                 completed: false
             },
-            loading: true,
+            noConnectionSnackbar: !navigator.onLine,
+            searchQuery: '' as string,
+            loading: true as boolean,
             sections: [] as Section[],
-            selectedItems: [] as any
+            filteredItems: [] as Item[],
+            items: [] as Item[],
+            selectedItems: [] as Item[],
         }),
+        directives: {
+            LongPressDirective
+        },
         methods: {
             onFirebaseError(err: FirebaseError): void {
                 if (err.code === 'PERMISSION_DENIED') {
                     this.$router.replace({name: 'Auth'});
                 } else {
                     console.log(err);
+                }
+            },
+            filterResults(): void {
+                if (!this.searchQuery) {
+                    this.filteredItems = [];
+                } else {
+                    this.filteredItems = this.items.filter(item => item.value.toLowerCase().includes(this.searchQuery.toLowerCase()));
                 }
             },
             toggleEditMode(): void {
@@ -103,41 +146,60 @@
                         this.selectedItems[item.id] = itemData;
                     }
                 } else {
-                    firebase.database().ref('sections/' + section.id + '/items/' + item.id).set(item).catch(this.onFirebaseError);
+                    if (item.checked) {
+                        firebase.firestore().collection('items').doc(item.id).update({
+                            checked: item.checked
+                        }).catch(this.onFirebaseError);
+                    } else {
+                        firebase.firestore().collection('items').doc(item.id).update({
+                            checked: firebase.firestore.FieldValue.delete()
+                        }).catch(this.onFirebaseError);
+                    }
                 }
             },
-            getItems(): void {
-                if (navigator.onLine) {
-                    this.loading = true;
-                    firebase.database().ref('sections').on('value', (sectionData: any) => {
-                        this.sections = sectionData.val() || [];
-                        this.selectedItems = [];
-
-                        for (const section in this.sections) {
-                            if (this.sections.hasOwnProperty(section)) {
-                                const sectionData = this.sections[section];
-
-                                sectionData.items = _.orderBy(sectionData.items, 'value', 'asc');
-
-                                for (const item in sectionData.items) {
-                                    if (sectionData.items.hasOwnProperty(item)) {
-                                        const itemData: Item = Object.assign({}, sectionData.items[item]);
-
-                                        if (itemData.checked) {
-                                            itemData.sectionId = sectionData.id;
-                                            // this.selectedItems.push(itemData);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        localStorage.setItem('sections', JSON.stringify(this.sections));
-                        this.loading = false;
-                    }, this.onFirebaseError);
-                } else if (localStorage.getItem('sections')) {
-                    this.sections = JSON.parse(localStorage.getItem('sections') || '');
+            getSections(): void {
+                this.loading = true;
+                firebase.firestore().collection('sections').orderBy('value').onSnapshot((collection) => {
+                    this.sections = [];
+                    collection.forEach((doc) => {
+                        this.sections.push({
+                            id: doc.id,
+                            value: doc.data().value,
+                        });
+                    });
                     this.loading = false;
-                }
+                }, (err) => {
+                    console.error('Something went wrong', err);
+                });
+            },
+            getItems(): void {
+                this.loading = true;
+                firebase.firestore().collection('items').orderBy('value').onSnapshot((collection) => {
+                    this.items = [];
+                    collection.forEach((doc) => {
+                        this.items.push({
+                            sectionId: doc.data().sectionId,
+                            amount: doc.data().amount,
+                            id: doc.id,
+                            value: doc.data().value,
+                            checked: doc.data().checked,
+                            markedForDeletion: doc.data().markedForDeletion
+                        });
+                    });
+                    this.loading = false;
+                }, (err) => {
+                    console.error('Something went wrong', err);
+                });
+            },
+            getItemsBySectionId(sectionId: string) {
+                var items = this.searchQuery ? this.filteredItems : this.items;
+
+                return items.filter(item => {
+                    if (this.searchQuery && !(this.settings.editMode || this.settings.completed)) {
+                        return item.sectionId === sectionId && !item.checked;
+                    }
+                    return item.sectionId === sectionId
+                });
             },
             editItem(item: Item, section: Section) {
                 this.$router.push({ name: 'editItem', params: { sectionId: section.id, itemId: item.id }});
@@ -147,7 +209,7 @@
                     if (this.selectedItems.hasOwnProperty(key)) {
                         const item = this.selectedItems[key];
 
-                        firebase.database().ref('sections/' + item.sectionId + '/items/' + item.id).remove().catch(this.onFirebaseError);
+                        firebase.firestore().collection('items').doc(item.id).delete().catch(this.onFirebaseError);
                     }
                 }
             }
@@ -161,10 +223,10 @@
             }
         },
         watch: {
-            editMode(state) {
+            editMode(state: boolean) {
                 this.settings.editMode = state;
             },
-            completedItems(state) {
+            completedItems(state: boolean) {
                 this.settings.completed = state;
             }
         },
@@ -173,13 +235,26 @@
                 editMode: this.$store.state.settings.editMode,
                 completed: this.$store.state.settings.completed
             };
+            this.getSections();
             this.getItems();
+
+            window.addEventListener('online', () => {
+                this.noConnectionSnackbar = false;
+            });
+
+            window.addEventListener('offline', () => {
+                this.noConnectionSnackbar = true;
+            });
         }
     });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='scss'>
+    .v-input {
+        padding-left: 2%;
+        padding-right: 2%;
+    }
     .v-list {
         display: flex;
         flex-flow: row wrap;

@@ -11,7 +11,7 @@
 
                 <v-card-text>
                     <v-form v-model="validForm">
-                        <v-autocomplete required clearable autofocus
+                        <v-autocomplete required clearable
                             label="Section *"
                             v-model="section.id"
                             :rules="notEmptyRule"
@@ -48,18 +48,18 @@
 <script lang="ts">
     import Dialog from './Dialog.vue';
     import firebase, { FirebaseError } from 'firebase/app';
-    import 'firebase/database';
-    import Reference = firebase.database.Reference;
+    import 'firebase/firestore';
+    import DocumentReference = firebase.firestore.DocumentReference;
 
     type Item = {
-        amount: number
+        sectionId: string,
+        amount?: string
         id: string,
         value: string
     }
 
     type Section = {
         id: string,
-        items: Array<Item>,
         value: string
     }
 
@@ -70,7 +70,6 @@
                 (v: string) => !!v || 'Please fill in a value'
             ],
             showDialog: true,
-            initialSectionId: <string> '',
             section: <Section> {},
             item: <Item> {}
         }),
@@ -79,41 +78,50 @@
                 if (!this.validForm) {
                     return;
                 }
+
                 // Capitalize values
                 this.item.value = this.item.value.charAt(0).toUpperCase() + this.item.value.substring(1);
-                // this.section.value = this.section.value.charAt(0).toUpperCase() + this.section.value.substring(1);
 
-                // section = this.checkForExistingRef(this.sections, 'value', this.section.value);
+                this.item.sectionId = this.section.id;
 
+                // We can't provide undefined values, so if it's empty remove it.
+                Object.keys(this.item).forEach(key => this.item[key] === undefined && delete this.item[key])
 
-                this.getRef(this.section.id, this.item.id).set(this.item).then(() => {
-                    if (this.initialSectionId !== this.section.id) {
-                        this.getRef(this.initialSectionId, this.item.id).remove().then(
-                            this.closeDialog
-                        );
-                    } else {
-                        this.closeDialog();
-                    }
+                this.getItemDoc(this.item.id).set(this.item).then(() => {
+                    this.closeDialog();
                 });
             },
-            getRef(sectionId: string, itemId: string): Reference {
-                return firebase.database().ref(`sections/${sectionId}/items/${itemId}`);
+            getItemDoc(itemId?: string): DocumentReference {
+                if (itemId) {
+                    return firebase.firestore().collection('items').doc(itemId);
+                } else {
+                    return firebase.firestore().collection('items').doc();
+                }
             },
             getItemData(): void {
-                this.getRef(this.section.id, this.item.id).once('value', (itemData: any) => {
-                    this.item = itemData.val();
-                }, (err: FirebaseError) => {
+                this.getItemDoc(this.item.id).get().then((doc) => {
+                    var data = doc.data();
+
+                    if (data) {
+                        this.item = {
+                            sectionId: data && data.sectionId,
+                            amount: data && data.amount,
+                            id: doc.id,
+                            value: data && data.value,
+                        };
+                    }
+                }).catch((err: FirebaseError) => {
                     console.log(err);
                 });
             }
         },
         beforeMount() {
             if (Object.keys(this.$route.params).length) {
-                this.section.id = this.initialSectionId = this.$route.params.sectionId;
+                this.section.id = this.$route.params.sectionId;
                 this.item.id = this.$route.params.itemId;
                 this.getItemData();
             }
-            this.getItems();
+            this.getSections();
         }
     })
 </script>
