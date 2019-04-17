@@ -11,14 +11,14 @@
 
                 <v-card-text>
                     <v-form v-model="validForm">
-                        <v-autocomplete required clearable
+                        <v-combobox required clearable
                             label="Section *"
-                            v-model="section.id"
+                            v-model="section"
                             :rules="notEmptyRule"
                             :items="sections"
                             item-text="value"
-                            item-value="id">
-                        </v-autocomplete>
+                            item-value="section.id">
+                        </v-combobox>
 
                         <v-text-field required
                             label="Item *"
@@ -70,7 +70,7 @@
                 (v: string) => !!v || 'Please fill in a value'
             ],
             showDialog: true,
-            section: <Section> {},
+            section: <Section|undefined> undefined,
             item: <Item> {}
         }),
         methods: {
@@ -82,15 +82,35 @@
                 // Capitalize values
                 this.item.value = this.item.value.charAt(0).toUpperCase() + this.item.value.substring(1);
 
-                this.item.sectionId = this.section.id;
+                this.getSectionId().then((sectionId) => {
+                    this.item.sectionId = sectionId;
 
-                // We can't provide undefined values, so if it's empty remove it.
-                Object.keys(this.item).forEach(key => this.item[key] === undefined && delete this.item[key])
+                    // We can't provide undefined values, so if it's empty remove it.
+                    Object.keys(this.item).forEach(key => this.item[key] === undefined && delete this.item[key])
 
-                this.getItemDoc(this.item.id).set(this.item).then(() => {
-                    this.closeDialog();
+                    this.getItemDoc(this.item.id).set(this.item).then(() => {
+                        this.closeDialog();
+                    });
                 });
             },
+            getSectionId(): Promise<string> {
+                if (!this.section) {
+                    return Promise.reject();
+                } else {
+                    if (this.section && this.section.id) {
+                        return Promise.resolve(this.section.id);
+                    } else {
+                        var sectionRef = firebase.firestore().collection('sections');
+
+                        return sectionRef.add({
+                            value: this.section
+                        }).then(function (sectionRef) {
+                            return Promise.resolve(sectionRef.id);
+                        });
+                    }
+                }
+            },
+
             getItemDoc(itemId?: string): DocumentReference {
                 if (itemId) {
                     return firebase.firestore().collection('items').doc(itemId);
@@ -117,11 +137,15 @@
         },
         beforeMount() {
             if (Object.keys(this.$route.params).length) {
-                this.section.id = this.$route.params.sectionId;
                 this.item.id = this.$route.params.itemId;
                 this.getItemData();
             }
-            this.getSections();
+
+            this.getSections().then(() => {
+                this.section = this.sections.find((section) => {
+                    return section.id === this.$route.params.sectionId;
+                });
+            })
         }
     })
 </script>
