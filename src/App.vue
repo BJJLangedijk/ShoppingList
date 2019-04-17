@@ -61,9 +61,9 @@ export default Vue.extend({
     beforeMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.$router.push({name: 'List'});
+                this.$router.replace({name: 'Overview'});
             } else {
-                this.$router.push({name: 'Auth'});
+                this.$router.replace({name: 'Auth'});
             }
         });
         this.settings = {

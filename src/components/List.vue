@@ -159,7 +159,8 @@
             },
             getSections(): void {
                 this.loading = true;
-                firebase.firestore().collection('sections').orderBy('value').onSnapshot((collection) => {
+
+                firebase.firestore().collection('lists/' + this.$route.params.id +  '/sections').orderBy('value').onSnapshot((collection) => {
                     this.sections = [];
                     collection.forEach((doc) => {
                         this.sections.push({
@@ -174,7 +175,8 @@
             },
             getItems(): void {
                 this.loading = true;
-                firebase.firestore().collection('items').orderBy('value').onSnapshot((collection) => {
+
+                firebase.firestore().collection('lists/' + this.$route.params.id +  '/items').orderBy('value').onSnapshot((collection) => {
                     this.items = [];
                     collection.forEach((doc) => {
                         this.items.push({

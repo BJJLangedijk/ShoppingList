@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+const Overview = () => import('@/components/Overview.vue');
 const List = () => import('@/components/List.vue');
 const Item = () => import('@/components/dialogs/Item.vue');
 const Auth = () => import('@/components/Auth.vue');
@@ -18,13 +19,21 @@ const router = new Router({
             component: Auth,
         },
         {
-            path: '/',
+            path: '/list/:id',
             name: 'List',
             component: List,
             children: [
                 {path: '/add', component: Item, name: 'addItem'},
                 {path: '/edit/section/:sectionId/item/:itemId', component: Item, name: 'editItem'}
             ],
+            meta: {
+                requiresAuth: true
+            },
+        },
+        {
+            path: '',
+            name: 'Overview',
+            component: Overview,
             meta: {
                 requiresAuth: true
             },
