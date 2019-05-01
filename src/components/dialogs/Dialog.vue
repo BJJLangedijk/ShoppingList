@@ -21,8 +21,8 @@ export default Vue.extend({
     methods: {
         confirm(): void {
         },
-        getSections(): void {
-            firebase.firestore().collection('sections').orderBy('value').get().then((collection) => {
+        getSections(): Promise<void> {
+            return firebase.firestore().collection('sections').orderBy('value').get().then((collection) => {
                 this.sections = [];
                 collection.forEach((doc) => {
                     this.sections.push({
