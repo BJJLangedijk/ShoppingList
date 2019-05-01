@@ -21,7 +21,7 @@
                 <v-subheader>{{section.value}}</v-subheader>
 
                 <template v-for="item in getItemsBySectionId(section.id)">
-                    <v-list-tile :key="item.id" v-if="settings.editMode || settings.completed || !item.checked">
+                    <v-list-tile :key="item.id">
                         <v-list-tile-action>
                             <template v-if="settings.editMode">
                                 <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
@@ -195,10 +195,11 @@
                 var items = this.searchQuery ? this.filteredItems : this.items;
 
                 return items.filter(item => {
-                    if (this.searchQuery && !(this.settings.editMode || this.settings.completed)) {
+                    if (this.searchQuery || this.settings.editMode || this.settings.completed) {
+                        return item.sectionId === sectionId;
+                    } else {
                         return item.sectionId === sectionId && !item.checked;
                     }
-                    return item.sectionId === sectionId
                 });
             },
             editItem(item: Item, section: Section) {
