@@ -32,7 +32,7 @@
                         </v-list-tile-action>
                         <v-list-tile-content v-long-press='function () { editItem(item, section) }'>
                             <v-list-tile-title>{{ item.value }}</v-list-tile-title>
-                            <v-list-tile-sub-title>{{ item.amount }}</v-list-tile-sub-title>
+                            <v-list-tile-sub-title v-if="item.amount">{{ item.amount }}</v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
                 </template>
