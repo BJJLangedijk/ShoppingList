@@ -37,8 +37,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn flat @click="closeDialog()">Close</v-btn>
-                    <v-btn flat @click="confirm()">Save</v-btn>
+                    <v-btn text @click="closeDialog()">Close</v-btn>
+                    <v-btn text @click="confirm()">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
