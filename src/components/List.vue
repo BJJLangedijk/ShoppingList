@@ -21,20 +21,20 @@
                 <v-subheader>{{section.value}}</v-subheader>
 
                 <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())">
-                    <v-list-tile :key="item.id" v-if="!item.checked || shouldFilterItems()">
-                        <v-list-tile-action>
+                    <v-list-item :key="item.id" v-if="!item.checked || shouldFilterItems()">
+                        <v-list-item-action>
                             <template v-if="settings.editMode">
                                 <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
                             </template>
                             <template v-else>
                                 <v-checkbox v-model="item.checked" @change="toggleSelection(item, section)"/>
                             </template>
-                        </v-list-tile-action>
-                        <v-list-tile-content v-long-press='function () { editItem(item, section) }'>
-                            <v-list-tile-title>{{ item.value }}</v-list-tile-title>
-                            <v-list-tile-sub-title v-if="item.amount">{{ item.amount }}</v-list-tile-sub-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
+                        </v-list-item-action>
+                        <v-list-item-content v-long-press='function () { editItem(item, section) }'>
+                            <v-list-item-title>{{ item.value }}</v-list-item-title>
+                            <v-list-item-subtitle>{{ item.amount }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
                 </template>
             </div>
         </template>
@@ -289,10 +289,10 @@
         margin-top: -30px;
         margin-left: -30px;
     }
-    .v-checked + .v-list-tile-text {
+    .v-checked + .v-list-item-text {
         text-decoration: line-through;
     }
-    .editMode .v-list-tile-text {
+    .editMode .v-list-item-text {
         text-decoration: none !important;
     }
     .v-field {
