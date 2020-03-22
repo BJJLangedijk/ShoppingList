@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import './plugins/vuetify';
+import './store';
+import vuetify from '@/plugins/vuetify';
 const App = () => import('./App.vue');
 import router from './router';
 import store from './store';
@@ -7,7 +8,6 @@ import './registerServiceWorker';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
-Vue.config.productionTip = false;
 
 firebase.firestore().enablePersistence()
   .catch(function(err) {
@@ -17,5 +17,6 @@ firebase.firestore().enablePersistence()
 new Vue({
   router,
   store,
-  render: (h) => h(App),
+  vuetify,
+  render: (h) => h(App)
 }).$mount('#app');

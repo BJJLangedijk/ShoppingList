@@ -1,19 +1,19 @@
 <template>
     <v-app>
-        <v-toolbar fixed app dark :color="settings.editMode ? '': 'primary'" >
-            <v-toolbar-title>Shopping List</v-toolbar-title>
+        <v-app-bar app dark color="primary" >
+            <v-toolbar-title class="title">Shopping List</v-toolbar-title>
 
             <v-spacer></v-spacer>
             <!-- Maybe there's a better way to match routes -->
             <div v-if="$route.name === 'List'">
-                <v-btn icon v-if="!settings.editMode" :color="`${settings.completed ? 'accent': 'primary'}`" @click="toggleCompletedItems()">
-                    <v-icon>done_all</v-icon>
+                <v-btn text icon :color="`${settings.completed ? '': 'secondary'}`" :disabled="settings.editMode" @click="toggleCompletedItems()">
+                    <v-icon>mdi-check-all</v-icon>
                 </v-btn>
-                <v-btn flat icon @click="toggleEditMode()">
-                    <v-icon>edit</v-icon>
+                <v-btn text icon :color="`${settings.editMode ? '': 'secondary'}`" :disabled="settings.completed" @click="toggleEditMode()">
+                    <v-icon>mdi-pencil</v-icon>
                 </v-btn>
             </div>
-        </v-toolbar>
+        </v-app-bar>
         <v-content>
             <router-view />
         </v-content>
@@ -43,10 +43,10 @@ export default Vue.extend({
         }
     },
     computed: {
-        editMode(): any {
+        editMode(): boolean {
             return this.$store.state.settings.editMode;
         },
-        completedItems(): any {
+        completedItems(): boolean {
             return this.$store.state.settings.completed;
         }
     },

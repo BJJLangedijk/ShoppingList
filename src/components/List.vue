@@ -3,25 +3,25 @@
         <v-text-field
         clearable
         v-model="searchQuery"
-        prepend-icon="search"
+        prepend-icon="mdi-magnify"
         @input="filterResults"
         placeholder="Search for an item"
         class="p2"
         ></v-text-field>
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
 
-    <div v-else-if="searchQuery && !filteredItems.length" class="subheading text-xs-center">
+    <div v-else-if="searchQuery && !filteredItems.length" class="text-center">
         Could not find any items
     </div>
 
     <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
         <template v-for="section in sections">
-            <div v-if="getItemsBySectionId(section.id).length" :key="section.id">
+            <div v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length" :key="section.id">
                 <v-divider></v-divider>
                 <v-subheader>{{section.value}}</v-subheader>
 
-                <template v-for="item in getItemsBySectionId(section.id)">
-                    <v-list-tile :key="item.id">
+                <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())">
+                    <v-list-tile :key="item.id" v-if="!item.checked || shouldFilterItems()">
                         <v-list-tile-action>
                             <template v-if="settings.editMode">
                                 <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
@@ -42,33 +42,43 @@
     <template v-if="settings.editMode && Object.keys(selectedItems).length">
 
         <!-- Delete Button -->
-        <v-btn fab color="primary" @click="deleteItems()">
-            <v-icon>delete</v-icon>
+        <v-btn
+            fixed
+            bottom
+            right
+            fab
+            color="primary"
+            @click="deleteItems()">
+            <v-icon>mdi-delete</v-icon>
         </v-btn>
     </template>
 
     <template v-if="!settings.editMode">
 
         <!-- Add Button -->
-        <router-link :to="{name: 'addItem'}">
-            <v-btn fab color="primary">
-                <v-icon>add</v-icon>
-            </v-btn>
-        </router-link>
+        <v-btn
+            fixed
+            bottom
+            right
+            fab
+            color="primary"
+            @click="addItem()">
+            <v-icon>mdi-plus</v-icon>
+        </v-btn>
     </template>
 
     <router-view></router-view>
 
     <v-snackbar v-model="noConnectionSnackbar" :timeout=0 :multi-line=true>
-        <v-icon dark large class='mr-4'>cloud_off</v-icon>
-        <div class="text-xs-center">
-            <span>You don't seem to have internet!</span>
+        <v-icon dark large class='mr-4'>mdi-wifi-off</v-icon>
+        <div class="text-center">
+            <span>Not connected!</span>
             <br />
             <span>Using cached results</span>
         </div>
         <v-btn
             color="primary"
-            flat
+            text
             @click="noConnectionSnackbar = false"
         >
             Close
@@ -191,16 +201,21 @@
                     console.error('Something went wrong', err);
                 });
             },
-            getItemsBySectionId(sectionId: string) {
-                var items = this.searchQuery ? this.filteredItems : this.items;
+            shouldFilterItems(): boolean {
+                return this.settings.editMode || this.settings.completed || !!this.searchQuery;
+            },
+            getItemsBySectionId(sectionId: string, filterCheckedItems): Item[] {
+                var items = this.filteredItems.length ? this.filteredItems : this.items;
 
                 return items.filter(item => {
-                    if (this.searchQuery || this.settings.editMode || this.settings.completed) {
-                        return item.sectionId === sectionId;
-                    } else {
+                    if (filterCheckedItems) {
                         return item.sectionId === sectionId && !item.checked;
                     }
+                    return item.sectionId === sectionId;
                 });
+            },
+            addItem() {
+                this.$router.push({name: 'addItem'});
             },
             editItem(item: Item, section: Section) {
                 this.$router.push({ name: 'editItem', params: { sectionId: section.id, itemId: item.id }});
@@ -274,16 +289,10 @@
         margin-top: -30px;
         margin-left: -30px;
     }
-    .v-btn.v-btn--floating {
-        position: fixed;
-        bottom: 2vh;
-        right: 2vh;
-        z-index: 3;
-    }
-    .v-checked + .v-list-item-text {
+    .v-checked + .v-list-tile-text {
         text-decoration: line-through;
     }
-    .editMode .v-list-item-text {
+    .editMode .v-list-tile-text {
         text-decoration: none !important;
     }
     .v-field {
