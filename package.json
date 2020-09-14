@@ -18,6 +18,7 @@
     "vuex": "^3.5.1"
   },
   "devDependencies": {
+    "@mdi/font": "^5.5.55",
     "@types/jest": "^26.0.13",
     "@types/lodash": "^4.14.161",
     "@vue/cli-plugin-babel": "^4.5.6",
