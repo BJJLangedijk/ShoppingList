@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import firebase, { FirebaseError } from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/firestore';
 
 interface Section {
@@ -30,7 +30,7 @@ export default Vue.extend({
                         value: doc.data().value,
                     });
                 });
-            }).catch((err: FirebaseError) => {
+            }).catch((err) => {
                 console.log(err);
             });
         },

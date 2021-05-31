@@ -69,7 +69,7 @@
 
     <router-view></router-view>
 
-    <v-snackbar v-model="noConnectionSnackbar" :timeout=0 :multi-line=true>
+    <v-snackbar v-model="noConnectionSnackbar" :timeout=-1 :multi-line=true>
         <v-icon dark large class='mr-4'>mdi-wifi-off</v-icon>
         <div class="text-center">
             <span>Not connected!</span>
@@ -89,7 +89,7 @@
 
 <script lang='ts'>
     import Vue from 'vue';
-    import firebase, { FirebaseError } from 'firebase/app';
+    import firebase from 'firebase/app';
     import { LongPressDirective } from '../directives/long-press';
     import 'firebase/firestore';
 
@@ -125,7 +125,7 @@
             LongPressDirective
         },
         methods: {
-            onFirebaseError(err: FirebaseError): void {
+            onFirebaseError(err): void {
                 if (err.code === 'PERMISSION_DENIED') {
                     this.$router.replace({name: 'Auth'});
                 } else {

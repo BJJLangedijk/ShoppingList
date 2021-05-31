@@ -47,7 +47,7 @@
 
 <script lang="ts">
     import Dialog from './Dialog.vue';
-    import firebase, { FirebaseError } from 'firebase/app';
+    import firebase from 'firebase/app';
     import 'firebase/firestore';
     import DocumentReference = firebase.firestore.DocumentReference;
 
@@ -130,7 +130,7 @@
                             value: data && data.value,
                         };
                     }
-                }).catch((err: FirebaseError) => {
+                }).catch((err) => {
                     console.log(err);
                 });
             }

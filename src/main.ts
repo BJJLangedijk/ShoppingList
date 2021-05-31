@@ -1,18 +1,17 @@
 import Vue from 'vue';
-import './store';
-import vuetify from '@/plugins/vuetify';
-const App = () => import('./App.vue');
-import router from './router';
-import store from './store';
-import './registerServiceWorker';
+import vuetify from './plugins/vuetify'
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import store from './store';
+import router from './router';
+import './registerServiceWorker';
+import App from './App.vue';
 
 
 firebase.firestore().enablePersistence()
-  .catch(function(err) {
-    console.log('Couldn\'t enable persistent storage', err);
-  });
+    .catch((err) => {
+        console.log('Couldn\'t enable persistent storage', err);
+    });
 
 new Vue({
   router,
