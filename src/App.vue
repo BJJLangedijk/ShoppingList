@@ -6,6 +6,9 @@
             <v-spacer></v-spacer>
             <!-- Maybe there's a better way to match routes -->
             <div v-if="$route.name === 'List'">
+                <v-btn text icon :color="`${settings.searchBarActive ? '': 'secondary'}`" @click="toggleSearchBar()">
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
                 <v-btn text icon :color="`${settings.completed ? '': 'secondary'}`" :disabled="settings.editMode" @click="toggleCompletedItems()">
                     <v-icon>mdi-check-all</v-icon>
                 </v-btn>
@@ -29,11 +32,16 @@ export default Vue.extend({
     name: 'App',
     data: () => ({
         settings: {
+            searchBarActive: false,
             editMode: false,
             completed: false
         }
     }),
     methods: {
+        toggleSearchBar(value: boolean): void {
+            this.$store.commit('toggleSearchBar', value);
+
+        },
         toggleEditMode(value: boolean): void {
             this.$store.commit('toggleEditMode', value);
 
@@ -43,6 +51,9 @@ export default Vue.extend({
         }
     },
     computed: {
+        searchBarActive(): boolean {
+            return this.$store.state.settings.searchBarActive;
+        },
         editMode(): boolean {
             return this.$store.state.settings.editMode;
         },
@@ -51,6 +62,9 @@ export default Vue.extend({
         }
     },
     watch: {
+        searchBarActive(state: boolean) {
+            this.settings.searchBarActive = state;
+        },
         editMode(state: boolean) {
             this.settings.editMode = state;
         },
@@ -67,6 +81,7 @@ export default Vue.extend({
             }
         });
         this.settings = {
+            searchBarActive: this.$store.state.settings.searchBarActive,
             editMode: this.$store.state.settings.editMode,
             completed: this.$store.state.settings.completed
         };

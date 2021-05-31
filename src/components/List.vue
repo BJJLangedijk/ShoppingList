@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-text-field
-        v-if="settings.editMode || settings.completed"
+        v-if="settings.searchBarActive"
         clearable
         v-model="searchQuery"
         prepend-icon="mdi-magnify"
@@ -111,6 +111,7 @@
     export default Vue.extend({
         data: () => ({
             settings: {
+                searchBarActive: false,
                 editMode: false,
                 completed: false
             },
@@ -232,6 +233,9 @@
             }
         },
         computed: {
+            searchBarActive(): any {
+                return this.$store.state.settings.searchBarActive;
+            },
             editMode(): any {
                 return this.$store.state.settings.editMode;
             },
@@ -240,6 +244,9 @@
             }
         },
         watch: {
+            searchBarActive(state: boolean) {
+                this.settings.searchBarActive = state;
+            },
             editMode(state: boolean) {
                 this.settings.editMode = state;
             },
@@ -249,6 +256,7 @@
         },
         beforeMount() {
             this.settings = {
+                searchBarActive: this.$store.state.settings.searchBarActive,
                 editMode: this.$store.state.settings.editMode,
                 completed: this.$store.state.settings.completed
             };

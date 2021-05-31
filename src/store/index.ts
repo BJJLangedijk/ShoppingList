@@ -6,17 +6,21 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
       settings: {
-          editMode: false,
-          completed: false
+            searchBarActive: false,
+            editMode: false,
+            completed: false
       }
   },
   getters: {
-      getEditMode(state) {
-          return state.settings.editMode;
-      },
-      getCompletedItems(state) {
-          return state.settings.completed;
-      }
+        getSearchActive(state) {
+            return state.settings.searchBarActive;
+        },
+        getEditMode(state) {
+            return state.settings.editMode;
+        },
+        getCompletedItems(state) {
+            return state.settings.completed;
+        }
   },
   mutations: {
       initialiseStore(state) {
@@ -29,6 +33,9 @@ export default new Vuex.Store({
                   Object.assign(state, JSON.parse(localStorage.getItem('store') || '')), 'store'
               );
           }
+      },
+      toggleSearchBar(state) {
+          state.settings.searchBarActive = !state.settings.searchBarActive;
       },
       toggleEditMode(state) {
           state.settings.editMode = !state.settings.editMode;
