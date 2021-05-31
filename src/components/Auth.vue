@@ -32,10 +32,12 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
+        padding: 20%;
+        text-align: center;
     }
     img {
         margin: 20px 0;
-        flex-basis: 25vh;
+        width: 33%;
     }
     .v-btn {
         margin: 20px 0;
