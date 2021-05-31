@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-text-field
+        v-if="settings.editMode || settings.completed"
         clearable
         v-model="searchQuery"
         prepend-icon="mdi-magnify"
