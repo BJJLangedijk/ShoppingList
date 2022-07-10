@@ -1,21 +1,22 @@
 <template>
     <v-app>
         <v-app-bar app dark color="primary" >
-            <v-toolbar-title class="title">Shopping List</v-toolbar-title>
+            <v-app-bar-title>Shopping List</v-app-bar-title>
 
             <v-spacer></v-spacer>
+
             <!-- Maybe there's a better way to match routes -->
-            <div v-if="$route.name === 'List'">
-                <v-btn text icon :color="`${settings.searchBarActive ? '': 'secondary'}`" @click="toggleSearchBar()">
+            <template v-if="$route.name === 'List'">
+                <v-btn icon :color="`${searchBarActive ? '': 'secondary'}`" @click="toggleSearchBar()">
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
-                <v-btn text icon :color="`${settings.completed ? '': 'secondary'}`" :disabled="settings.editMode" @click="toggleCompletedItems()">
+                <v-btn icon :color="`${completedItems ? '': 'secondary'}`" :disabled="editMode" @click="toggleCompletedItems()">
                     <v-icon>mdi-check-all</v-icon>
                 </v-btn>
-                <v-btn text icon :color="`${settings.editMode ? '': 'secondary'}`" :disabled="settings.completed" @click="toggleEditMode()">
+                <v-btn icon :color="`${editMode ? '': 'secondary'}`" :disabled="completedItems" @click="toggleEditMode()">
                     <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-            </div>
+            </template>
         </v-app-bar>
         <v-main>
             <router-view />
@@ -24,19 +25,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
-export default Vue.extend({
+export default defineComponent({
     name: 'App',
-    data: () => ({
-        settings: {
-            searchBarActive: false,
-            editMode: false,
-            completed: false
-        }
-    }),
     methods: {
         toggleSearchBar(value: boolean): void {
             this.$store.commit('toggleSearchBar', value);
@@ -52,24 +46,13 @@ export default Vue.extend({
     },
     computed: {
         searchBarActive(): boolean {
-            return this.$store.state.settings.searchBarActive;
+            return this.$store.getters.searchBarActive;
         },
         editMode(): boolean {
-            return this.$store.state.settings.editMode;
+            return this.$store.getters.editMode;
         },
         completedItems(): boolean {
-            return this.$store.state.settings.completed;
-        }
-    },
-    watch: {
-        searchBarActive(state: boolean) {
-            this.settings.searchBarActive = state;
-        },
-        editMode(state: boolean) {
-            this.settings.editMode = state;
-        },
-        completedItems(state: boolean) {
-            this.settings.completed = state;
+            return this.$store.getters.completedItems;
         }
     },
     beforeMount() {
@@ -80,11 +63,6 @@ export default Vue.extend({
                 this.$router.replace({name: 'Auth'});
             }
         });
-        this.settings = {
-            searchBarActive: this.$store.state.settings.searchBarActive,
-            editMode: this.$store.state.settings.editMode,
-            completed: this.$store.state.settings.completed
-        };
     }
 });
 </script>

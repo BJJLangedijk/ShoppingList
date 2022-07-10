@@ -1,9 +1,14 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 
-Vue.use(Vuex);
+export interface ShoppingState {
+    settings: {
+        searchBarActive: boolean;
+        editMode: boolean;
+        completed: boolean;
+    }
+}
 
-export default new Vuex.Store({
+export default createStore<ShoppingState>({
   state: {
       settings: {
             searchBarActive: false,
@@ -12,13 +17,13 @@ export default new Vuex.Store({
       }
   },
   getters: {
-        getSearchActive(state) {
+        searchBarActive(state) {
             return state.settings.searchBarActive;
         },
-        getEditMode(state) {
+        editMode(state) {
             return state.settings.editMode;
         },
-        getCompletedItems(state) {
+        completedItems(state) {
             return state.settings.completed;
         }
   },

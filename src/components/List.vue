@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-text-field
-        v-if="settings.searchBarActive"
+        v-if="searchBarActive"
         clearable
         v-model="searchQuery"
         prepend-icon="mdi-magnify"
@@ -9,38 +9,42 @@
         placeholder="Search for an item"
         class="p2"
         ></v-text-field>
+
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
 
     <div v-else-if="searchQuery && !filteredItems.length" class="text-center">
         Could not find any items
     </div>
 
-    <v-list v-else v-bind:class="{ 'editMode': settings.editMode }">
-        <template v-for="section in sections">
-            <div v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length" :key="section.id">
-                <v-divider></v-divider>
-                <v-subheader>{{section.value}}</v-subheader>
+    <div class="list-wrapper" v-else v-bind:class="{ 'editMode': editMode }">
+        <template v-for="section in sections" :key="section.id">
+            <!-- <v-lazy v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length"> -->
+                <v-list v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length" density="compact">
+                    <v-divider />
 
-                <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())">
-                    <v-list-item :key="item.id" v-if="!item.checked || shouldFilterItems()">
-                        <v-list-item-action>
-                            <template v-if="settings.editMode">
-                                <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
-                            </template>
-                            <template v-else>
-                                <v-checkbox v-model="item.checked" @change="toggleSelection(item, section)"/>
-                            </template>
-                        </v-list-item-action>
-                        <v-list-item-content v-long-press='function () { editItem(item, section) }'>
-                            <v-list-item-title>{{ item.value }}</v-list-item-title>
-                            <v-list-item-subtitle>{{ item.amount }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                    </v-list-item>
-                </template>
-            </div>
+                    <v-list-subheader>{{section.value}}</v-list-subheader>
+
+                    <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())" :key="item.id" >
+                        <v-list-item v-if="!item.checked || shouldFilterItems()">
+                            <v-list-item-action>
+                                <template v-if="editMode">
+                                    <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
+                                </template>
+                                <template v-else>
+                                    <v-checkbox v-model="item.checked" @change="toggleSelection(item, section)"/>
+                                </template>
+                            </v-list-item-action>
+                            <v-list-item-header v-long-press='function () { editItem(item, section) }'>
+                                <v-list-item-title>{{ item.value }}</v-list-item-title>
+                                <v-list-item-subtitle>{{ item.amount }}</v-list-item-subtitle>
+                            </v-list-item-header>
+                        </v-list-item>
+                    </template>
+                </v-list>
+            <!-- </v-lazy> -->
         </template>
-    </v-list>
-    <template v-if="settings.editMode && Object.keys(selectedItems).length">
+    </div>
+    <template v-if="editMode && Object.keys(selectedItems).length">
 
         <!-- Delete Button -->
         <v-btn
@@ -54,7 +58,7 @@
         </v-btn>
     </template>
 
-    <template v-if="!settings.editMode">
+    <template v-if="!editMode">
 
         <!-- Add Button -->
         <v-btn
@@ -89,9 +93,8 @@
 </template>
 
 <script lang='ts'>
-    import Vue from 'vue';
+    import { defineComponent } from 'vue';
     import firebase from 'firebase/app';
-    import { LongPressDirective } from '../directives/long-press';
     import 'firebase/firestore';
 
     interface Item {
@@ -108,13 +111,8 @@
         value: string;
     }
 
-    export default Vue.extend({
+    export default defineComponent({
         data: () => ({
-            settings: {
-                searchBarActive: false,
-                editMode: false,
-                completed: false
-            },
             noConnectionSnackbar: !navigator.onLine,
             searchQuery: '' as string,
             loading: true as boolean,
@@ -123,9 +121,6 @@
             items: [] as Item[],
             selectedItems: [] as Item[],
         }),
-        directives: {
-            LongPressDirective
-        },
         methods: {
             onFirebaseError(err): void {
                 if (err.code === 'PERMISSION_DENIED') {
@@ -147,7 +142,7 @@
             toggleSelection(item: Item, section: Section): void {
                 let itemData;
 
-                if (this.settings.editMode) {
+                if (this.editMode) {
                     itemData = Object.assign({}, item);
 
                     itemData.sectionId = section.id;
@@ -204,9 +199,9 @@
                 });
             },
             shouldFilterItems(): boolean {
-                return this.settings.editMode || this.settings.completed || !!this.searchQuery;
+                return this.editMode || this.completedItems || !!this.searchQuery;
             },
-            getItemsBySectionId(sectionId: string, filterCheckedItems): Item[] {
+            getItemsBySectionId(sectionId: string, filterCheckedItems: boolean): Item[] {
                 var items = this.filteredItems.length ? this.filteredItems : this.items;
 
                 return items.filter(item => {
@@ -233,36 +228,18 @@
             }
         },
         computed: {
-            searchBarActive(): any {
-                return this.$store.state.settings.searchBarActive;
+            searchBarActive(): boolean {
+                return this.$store.getters.searchBarActive;
             },
-            editMode(): any {
-                return this.$store.state.settings.editMode;
+            editMode(): boolean {
+                return this.$store.getters.editMode;
             },
-            completedItems(): any {
-                return this.$store.state.settings.completed;
+            completedItems(): boolean {
+                return this.$store.getters.completedItems;
             }
         },
-        watch: {
-            searchBarActive(state: boolean) {
-                this.settings.searchBarActive = state;
-            },
-            editMode(state: boolean) {
-                this.settings.editMode = state;
-            },
-            completedItems(state: boolean) {
-                this.settings.completed = state;
-            }
-        },
-        beforeMount() {
-            this.settings = {
-                searchBarActive: this.$store.state.settings.searchBarActive,
-                editMode: this.$store.state.settings.editMode,
-                completed: this.$store.state.settings.completed
-            };
-            this.getSections();
-            this.getItems();
 
+        beforeMount() {
             window.addEventListener('online', () => {
                 this.noConnectionSnackbar = false;
             });
@@ -270,6 +247,11 @@
             window.addEventListener('offline', () => {
                 this.noConnectionSnackbar = true;
             });
+        },
+
+        mounted() {
+            this.getSections();
+            this.getItems();
         }
     });
 </script>
@@ -277,10 +259,14 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='scss'>
     .v-input {
-        padding-left: 2%;
-        padding-right: 2%;
+        margin-left: 0;
+        margin-right: 25px;
+        --v-input-control-height: 48px - 7px;
     }
-    .v-list {
+    :deep() .v-input__details {
+        display: none;
+    }
+    .list-wrapper {
         display: flex;
         flex-flow: row wrap;
         max-width: 100vw;
@@ -289,6 +275,7 @@
             flex: 1 1 500px;
             padding: 1% 2%;
             min-width: 50%;
+            justify-items: center;
         }
     }
     .v-progress-circular {
