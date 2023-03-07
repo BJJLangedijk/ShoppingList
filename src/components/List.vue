@@ -118,6 +118,7 @@
         watch: {
             searchBarActive() {
                 this.searchQuery = '';
+                this.filteredItems = [];
             }
         },
         methods: {
