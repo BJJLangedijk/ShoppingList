@@ -28,7 +28,8 @@
                         <v-list-item v-if="!item.checked || shouldFilterItems()" v-long-press='function () { editItem(item, section) }'>
                             <template v-slot:prepend>
                                 <v-list-item-action start>
-                                    <v-checkbox-btn color="primary" :model-value="editMode ? item.markedForDeletion : item.checked"></v-checkbox-btn>
+                                    <v-checkbox-btn color="primary" v-if="editMode" v-model="item.markedForDeletion" @change="toggleSelection(item, section)"></v-checkbox-btn>
+                                    <v-checkbox-btn color="primary" v-else v-model="item.checked" @change="toggleSelection(item, section)"></v-checkbox-btn>
                                 </v-list-item-action>
                             </template>
                             <v-list-item-title>{{ item.value }}</v-list-item-title>
