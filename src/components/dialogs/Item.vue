@@ -1,6 +1,6 @@
 <template>
     <v-layout row justify-center>
-        <v-dialog v-model="showDialog" :fullscreen="shouldBeFullScreen" persistent max-width="300px">
+        <v-dialog v-model="showDialog" :fullscreen="shouldBeFullScreen" persistent :max-width="shouldBeFullScreen ? '' : '300px'">
             <v-card>
                 <v-card-title class="headline" v-if="$route.params.sectionId || $route.params.itemId">
                     Edit Item
