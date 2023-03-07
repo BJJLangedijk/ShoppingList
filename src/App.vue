@@ -29,16 +29,16 @@ import 'firebase/auth';
 export default defineComponent({
     name: 'App',
     methods: {
-        toggleSearchBar(value: boolean): void {
-            this.$store.commit('toggleSearchBar', value);
+        toggleSearchBar(): void {
+            this.$store.commit('toggleSearchBar');
 
         },
-        toggleEditMode(value: boolean): void {
-            this.$store.commit('toggleEditMode', value);
+        toggleEditMode(): void {
+            this.$store.commit('toggleEditMode');
 
         },
-        toggleCompletedItems(value: boolean): void {
-            this.$store.commit('toggleCompletedItems', value);
+        toggleCompletedItems(): void {
+            this.$store.commit('toggleCompletedItems');
         }
     },
     computed: {
