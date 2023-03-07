@@ -16,8 +16,8 @@
                             v-model="section"
                             :rules="notEmptyRule"
                             :items="sections"
-                            item-text="value"
-                            item-value="section.id">
+                            item-title="value"
+                            item-value="id">
                         </v-combobox>
 
                         <v-text-field required
@@ -50,6 +50,7 @@
     import firebase from 'firebase/app';
     import 'firebase/firestore';
     import DocumentReference = firebase.firestore.DocumentReference;
+    import { defineComponent } from '@vue/runtime-core';
 
     type Item = {
         sectionId: string,
@@ -63,7 +64,8 @@
         value: string
     }
 
-    export default Dialog.extend({
+    export default defineComponent({
+        extends: Dialog,
         data: () => ({
             validForm: false,
             notEmptyRule: [
@@ -137,7 +139,7 @@
         },
         beforeMount() {
             if (Object.keys(this.$route.params).length) {
-                this.item.id = this.$route.params.itemId;
+                this.item.id = this.$route.params.itemId as string;
                 this.getItemData();
             }
 

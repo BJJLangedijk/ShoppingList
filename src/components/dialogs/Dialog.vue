@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
@@ -8,7 +8,7 @@ interface Section {
     value: string;
 }
 
-export default Vue.extend({
+export default defineComponent({
     data: () => ({
         showDialog: true,
         sections: [] as Section[]

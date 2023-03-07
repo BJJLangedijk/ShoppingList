@@ -4,7 +4,9 @@ module.exports = {
         themeColor: '#1976d2',
     },
 
-    transpileDependencies: [
-      'vuetify'
-    ]
+    pluginOptions: {
+      vuetify: {
+			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+		}
+    }
 };

@@ -1,11 +1,9 @@
-import Vue from 'vue';
-
 const options = {
     duration: 500
 };
 
-export const LongPressDirective = {
-    bind: function (el, binding) {
+export default {
+    beforeMount: function (el, binding) {
         el.longPressTimeout = null;
         el._setLongPressTimeout = function (e) {
             var context = this;
@@ -27,7 +25,7 @@ export const LongPressDirective = {
         document.addEventListener('touchend', el._clearLongPressTimeout);
         window.addEventListener('scroll', el._clearLongPressTimeout);
     },
-    unbind: function (el) {
+    beforeUnmount: function (el) {
         el._clearLongPressTimeout();
         el.removeEventListener('touchstart', el._setLongPressTimeout);
         el.removeEventListener('mousedown', el._setLongPressTimeout);
@@ -37,5 +35,3 @@ export const LongPressDirective = {
         window.removeEventListener('scroll', el._clearLongPressTimeout);
     }
 };
-
-Vue.directive('long-press', LongPressDirective);

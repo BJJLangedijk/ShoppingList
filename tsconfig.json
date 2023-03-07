@@ -14,9 +14,7 @@
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "vuetify",
-      "jest",
-      "lodash"
+      "jest"
     ],
     "paths": {
       "@/*": [
