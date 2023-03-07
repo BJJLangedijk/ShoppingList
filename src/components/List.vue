@@ -4,10 +4,9 @@
         v-if="searchBarActive"
         clearable
         v-model="searchQuery"
-        prepend-icon="mdi-magnify"
+        prepend-inner-icon="mdi-magnify"
         @input="filterResults"
         placeholder="Search for an item"
-        class="p2"
         ></v-text-field>
 
     <v-progress-circular v-if="loading" color="accent" indeterminate></v-progress-circular>
@@ -25,19 +24,14 @@
                     <v-list-subheader>{{section.value}}</v-list-subheader>
 
                     <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())" :key="item.id" >
-                        <v-list-item v-if="!item.checked || shouldFilterItems()">
-                            <v-list-item-action>
-                                <template v-if="editMode">
-                                    <v-checkbox v-model="item.markedForDeletion" @change="toggleSelection(item, section)" />
-                                </template>
-                                <template v-else>
-                                    <v-checkbox v-model="item.checked" @change="toggleSelection(item, section)"/>
-                                </template>
-                            </v-list-item-action>
-                            <v-list-item-header v-long-press='function () { editItem(item, section) }'>
-                                <v-list-item-title>{{ item.value }}</v-list-item-title>
-                                <v-list-item-subtitle>{{ item.amount }}</v-list-item-subtitle>
-                            </v-list-item-header>
+                        <v-list-item v-if="!item.checked || shouldFilterItems()" v-long-press='function () { editItem(item, section) }'>
+                            <template v-slot:prepend>
+                                <v-list-item-action start>
+                                    <v-checkbox-btn color="primary" :model-value="editMode ? item.markedForDeletion : item.checked"></v-checkbox-btn>
+                                </v-list-item-action>
+                            </template>
+                            <v-list-item-title>{{ item.value }}</v-list-item-title>
+                            <v-list-item-subtitle>{{ item.amount }}</v-list-item-subtitle>
                         </v-list-item>
                     </template>
                 </v-list>
@@ -48,13 +42,12 @@
 
         <!-- Delete Button -->
         <v-btn
-            fixed
-            bottom
-            right
-            fab
+            position="fixed"
+            location="bottom right"
+            icon="mdi-delete"
             color="primary"
+            size="large"
             @click="deleteItems()">
-            <v-icon>mdi-delete</v-icon>
         </v-btn>
     </template>
 
@@ -62,13 +55,12 @@
 
         <!-- Add Button -->
         <v-btn
-            fixed
-            bottom
-            right
-            fab
+            position="fixed"
+            location="bottom right"
+            icon="mdi-plus"
             color="primary"
+            size="large"
             @click="addItem()">
-            <v-icon>mdi-plus</v-icon>
         </v-btn>
     </template>
 
@@ -258,14 +250,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='scss'>
-    .v-input {
-        margin-left: 0;
-        margin-right: 25px;
-        --v-input-control-height: 48px - 7px;
-    }
-    :deep() .v-input__details {
-        display: none;
-    }
     .list-wrapper {
         display: flex;
         flex-flow: row wrap;
@@ -285,15 +269,8 @@
         margin-top: -30px;
         margin-left: -30px;
     }
-    .v-checked + .v-list-item-text {
-        text-decoration: line-through;
-    }
-    .editMode .v-list-item-text {
-        text-decoration: none !important;
-    }
-    .v-field {
-        margin: 0;
-        padding: 0;
-        min-height: auto;
+
+    .v-btn--fixed {
+        margin: 1em;
     }
 </style>

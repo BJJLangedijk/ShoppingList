@@ -16,8 +16,8 @@
                             v-model="section"
                             :rules="notEmptyRule"
                             :items="sections"
-                            item-text="value"
-                            item-value="section.id">
+                            item-title="value"
+                            item-value="id">
                         </v-combobox>
 
                         <v-text-field required

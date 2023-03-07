@@ -1,23 +1,20 @@
 <template>
     <v-app>
-        <v-app-bar app dark color="primary" >
-            <v-app-bar-title>Shopping List</v-app-bar-title>
+        <v-toolbar color="primary">
+            <v-toolbar-title>Shopping List</v-toolbar-title>
 
             <v-spacer></v-spacer>
 
             <!-- Maybe there's a better way to match routes -->
             <template v-if="$route.name === 'List'">
-                <v-btn icon :color="`${searchBarActive ? '': 'secondary'}`" @click="toggleSearchBar()">
-                    <v-icon>mdi-magnify</v-icon>
+                <v-btn icon="mdi-magnify" :variant="`${searchBarActive ? 'elevated': 'text'}`" @click="toggleSearchBar()">
                 </v-btn>
-                <v-btn icon :color="`${completedItems ? '': 'secondary'}`" :disabled="editMode" @click="toggleCompletedItems()">
-                    <v-icon>mdi-check-all</v-icon>
+                <v-btn icon="mdi-check-all" :variant="`${completedItems ? 'elevated': 'text'}`" :disabled="editMode" @click="toggleCompletedItems()">
                 </v-btn>
-                <v-btn icon :color="`${editMode ? '': 'secondary'}`" :disabled="completedItems" @click="toggleEditMode()">
-                    <v-icon>mdi-pencil</v-icon>
+                <v-btn icon="mdi-pencil" :variant="`${editMode ? 'elevated': 'text'}`" :disabled="completedItems" @click="toggleEditMode()">
                 </v-btn>
             </template>
-        </v-app-bar>
+        </v-toolbar>
         <v-main>
             <router-view />
         </v-main>
