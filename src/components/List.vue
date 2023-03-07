@@ -6,6 +6,7 @@
         v-model="searchQuery"
         prepend-inner-icon="mdi-magnify"
         @input="filterResults"
+        @click:clear="filterResults"
         placeholder="Search for an item"
         ></v-text-field>
 
