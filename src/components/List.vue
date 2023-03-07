@@ -135,9 +135,6 @@
                     this.filteredItems = this.items.filter(item => item.value.toLowerCase().includes(this.searchQuery.toLowerCase()));
                 }
             },
-            toggleEditMode(): void {
-                this.$store.commit('toggleEditMode');
-            },
             toggleSelection(item: Item, section: Section): void {
                 let itemData;
 
