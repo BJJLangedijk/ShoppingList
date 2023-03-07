@@ -115,6 +115,11 @@
             items: [] as Item[],
             selectedItems: [] as Item[],
         }),
+        watch: {
+            searchBarActive() {
+                this.searchQuery = '';
+            }
+        },
         methods: {
             onFirebaseError(err): void {
                 if (err.code === 'PERMISSION_DENIED') {
