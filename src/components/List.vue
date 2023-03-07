@@ -17,7 +17,7 @@
 
     <div class="list-wrapper" v-else v-bind:class="{ 'editMode': editMode }">
         <template v-for="section in sections" :key="section.id">
-            <!-- <v-lazy v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length"> -->
+            <v-lazy v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length">
                 <v-list v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length" density="compact">
                     <v-divider />
 
@@ -35,7 +35,7 @@
                         </v-list-item>
                     </template>
                 </v-list>
-            <!-- </v-lazy> -->
+            </v-lazy>
         </template>
     </div>
     <template v-if="editMode && Object.keys(selectedItems).length">
