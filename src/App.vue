@@ -3,8 +3,6 @@
         <v-toolbar color="primary">
             <v-toolbar-title>Shopping List</v-toolbar-title>
 
-            <v-spacer></v-spacer>
-
             <!-- Maybe there's a better way to match routes -->
             <template v-if="$route.name === 'List'">
                 <v-btn icon="mdi-magnify" :variant="`${searchBarActive ? 'elevated': 'text'}`" @click="toggleSearchBar()">
