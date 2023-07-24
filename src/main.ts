@@ -4,12 +4,8 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import store from './store';
 import router from './router';
-import './registerServiceWorker';
 import App from './App.vue';
 import longPress from './directives/long-press';
-import { loadFonts } from './plugins/webfontloader'
-
-loadFonts()
 
 const firebaseConfig = {
 };

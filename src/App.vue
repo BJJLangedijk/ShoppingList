@@ -1,7 +1,7 @@
 <template>
     <v-app>
-        <v-toolbar color="primary">
-            <v-toolbar-title>Shopping List</v-toolbar-title>
+        <v-app-bar color="primary">
+            <v-app-bar-title>Shopping List</v-app-bar-title>
 
             <!-- Maybe there's a better way to match routes -->
             <template v-if="$route.name === 'List'">
@@ -12,7 +12,7 @@
                 <v-btn icon="mdi-pencil" :variant="`${editMode ? 'elevated': 'text'}`" :disabled="completedItems" @click="toggleEditMode()">
                 </v-btn>
             </template>
-        </v-toolbar>
+        </v-app-bar>
         <v-main>
             <router-view />
         </v-main>
@@ -26,6 +26,9 @@ import 'firebase/auth';
 
 export default defineComponent({
     name: 'App',
+    data: () => ({
+        version: import.meta.env.PACKAGE_VERSION
+    }),
     methods: {
         toggleSearchBar(): void {
             this.$store.commit('toggleSearchBar');
