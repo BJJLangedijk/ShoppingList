@@ -77,7 +77,6 @@
         </div>
         <v-btn
             color="primary"
-            text
             @click="noConnectionSnackbar = false"
         >
             Close
@@ -87,9 +86,9 @@
 </template>
 
 <script lang='ts'>
+    import { FirebaseError } from 'firebase/app';
+    import { getFirestore, collection, deleteDoc, deleteField, doc, onSnapshot, orderBy, updateDoc, query } from 'firebase/firestore';
     import { defineComponent } from 'vue';
-    import firebase from 'firebase/app';
-    import 'firebase/firestore';
 
     interface Item {
         sectionId: string;
@@ -122,7 +121,7 @@
             }
         },
         methods: {
-            onFirebaseError(err): void {
+            onFirebaseError(err: FirebaseError): void {
                 if (err.code === 'PERMISSION_DENIED') {
                     this.$router.replace({name: 'Auth'});
                 } else {
@@ -149,20 +148,24 @@
                         });
                     }
                 } else {
+                    const itemsRef = doc(getFirestore(), 'items', item.id);
+
                     if (item.checked) {
-                        firebase.firestore().collection('items').doc(item.id).update({
-                            checked: item.checked
+                        updateDoc(itemsRef, {
+                            checked: true
                         }).catch(this.onFirebaseError);
                     } else {
-                        firebase.firestore().collection('items').doc(item.id).update({
-                            checked: firebase.firestore.FieldValue.delete()
+                        updateDoc(itemsRef, {
+                            checked: deleteField()
                         }).catch(this.onFirebaseError);
                     }
                 }
             },
             getSections(): void {
                 this.loading = true;
-                firebase.firestore().collection('sections').orderBy('value').onSnapshot((collection) => {
+
+                const sectionsRef = collection(getFirestore(), 'sections');
+                onSnapshot(query(sectionsRef, orderBy('value')), (collection) => {
                     this.sections = [];
                     collection.forEach((doc) => {
                         this.sections.push({
@@ -177,7 +180,10 @@
             },
             getItems(): void {
                 this.loading = true;
-                firebase.firestore().collection('items').orderBy('value').onSnapshot((collection) => {
+
+                const itemsRef = collection(getFirestore(), 'items');
+
+                onSnapshot(query(itemsRef, orderBy('value')), (collection) => {
                     this.items = [];
                     collection.forEach((doc) => {
                         this.items.push({
@@ -215,7 +221,7 @@
             },
             deleteItems() {
                 this.selectedItems.forEach((item) => {
-                    firebase.firestore().collection('items').doc(item.id).delete().catch(this.onFirebaseError);
+                    deleteDoc(doc(getFirestore(), 'items', item.id)).catch(this.onFirebaseError);
                 });
             }
         },

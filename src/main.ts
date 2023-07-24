@@ -1,21 +1,18 @@
 import { createApp } from 'vue'
 import vuetify from './plugins/vuetify';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 import store from './store';
 import router from './router';
 import App from './App.vue';
 import longPress from './directives/long-press';
+import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 
 const firebaseConfig = {
 };
 
-firebase.initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 
-firebase.firestore().enablePersistence()
-    .catch((err) => {
-        console.log('Couldn\'t enable persistent storage', err);
-    });
+initializeFirestore(firebaseApp, {localCache: persistentLocalCache()});
 
 const app = createApp(App)
 

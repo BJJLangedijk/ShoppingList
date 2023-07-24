@@ -21,8 +21,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default defineComponent({
     name: 'App',
@@ -54,7 +53,7 @@ export default defineComponent({
         }
     },
     beforeMount() {
-        firebase.auth().onAuthStateChanged((user) => {
+        onAuthStateChanged(getAuth(), (user) => {
             if (user) {
                 this.$router.replace({name: 'List'});
             } else {

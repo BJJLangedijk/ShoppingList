@@ -40,8 +40,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text @click="closeDialog()">Close</v-btn>
-                    <v-btn text @click="confirm()">Save</v-btn>
+                    <v-btn @click="closeDialog()">Close</v-btn>
+                    <v-btn @click="confirm()">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -49,10 +49,8 @@
 </template>
 
 <script lang="ts">
+    import { getFirestore, addDoc, collection, updateDoc, doc, getDocFromCache } from 'firebase/firestore';
     import Dialog from './Dialog.vue';
-    import firebase from 'firebase/app';
-    import 'firebase/firestore';
-    import DocumentReference = firebase.firestore.DocumentReference;
     import { defineComponent } from '@vue/runtime-core';
 
     type Item = {
@@ -79,7 +77,7 @@
             item: {} as Item
         }),
         methods: {
-            confirm(): void {
+            async confirm(): Promise<void> {
                 if (!this.validForm) {
                     return;
                 }
@@ -87,63 +85,61 @@
                 // Capitalize values
                 this.item.value = this.item.value.charAt(0).toUpperCase() + this.item.value.substring(1);
 
-                this.getSectionId().then((sectionId) => {
-                    this.item.sectionId = sectionId;
-
-                    // We can't provide undefined values, so if it's empty remove it.
-                    Object.keys(this.item).forEach(key => this.item[key] === undefined && delete this.item[key])
-
-                    this.getItemDoc(this.item.id).set(this.item).then(() => {
-                        this.closeDialog();
-                    });
-                });
-            },
-            getSectionId(): Promise<string> {
                 if (!this.section) {
-                    return Promise.reject();
-                } else {
-                    if (this.section && this.section.id) {
-                        return Promise.resolve(this.section.id);
-                    } else {
-                        const sectionRef = firebase.firestore().collection('sections');
-
-                        return sectionRef.add({
-                            value: this.section
-                        }).then(function (sectionRef) {
-                            return Promise.resolve(sectionRef.id);
-                        });
-                    }
+                    return;
                 }
+
+                let sectionId = this.section.id;
+
+                if (!sectionId) {
+                    await addDoc(collection(getFirestore(), 'sections'), {
+                        value: this.section.value,
+                    }).then((docRef) => {
+                        sectionId = docRef.id;
+                    });
+                }
+
+                this.item.sectionId = sectionId;
+
+                if (!this.item.id) {
+                    await addDoc(collection(getFirestore(), 'items'), {
+                        sectionId: sectionId,
+                        amount: this.item.amount,
+                        value: this.item.value,
+                    });
+                } else {
+                    await updateDoc(doc(getFirestore(), 'items', this.item.id), {
+                        sectionId: sectionId,
+                        amount: this.item.amount,
+                        value: this.item.value,
+                    });
+                }
+                this.closeDialog();
             },
 
-            getItemDoc(itemId?: string): DocumentReference {
-                if (itemId) {
-                    return firebase.firestore().collection('items').doc(itemId);
-                } else {
-                    return firebase.firestore().collection('items').doc();
-                }
-            },
-            getItemData(): void {
-                this.getItemDoc(this.item.id).get().then((doc) => {
-                    const data = doc.data();
+            getItem(id: string): Promise<void> {
+                const itemRef = doc(getFirestore(), 'items', id);
 
-                    if (data) {
-                        this.item = {
-                            sectionId: data && data.sectionId,
-                            amount: data && data.amount,
-                            id: doc.id,
-                            value: data && data.value,
-                        };
+                return getDocFromCache(itemRef).then((doc) => {
+                    if (!doc.exists()) {
+                        throw new Error('Item does not exist');
                     }
+
+                    this.item = {
+                        sectionId: doc.data().sectionId,
+                        amount: doc.data().amount,
+                        id: doc.id,
+                        value: doc.data().value,
+                    };
                 }).catch((err) => {
                     console.log(err);
                 });
-            }
+            },
         },
         beforeMount() {
             if (Object.keys(this.$route.params).length) {
                 this.item.id = this.$route.params.itemId as string;
-                this.getItemData();
+                this.getItem(this.item.id);
             }
 
             this.getSections().then(() => {
