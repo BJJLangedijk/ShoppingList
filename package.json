@@ -6,7 +6,7 @@
     "dev": "vite",
     "serve": "vite preview",
     "build": "vite build",
-    "lint": "eslint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -17,12 +17,18 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
     "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/eslint-config-typescript": "^11.0.3",
     "eslint": "^8.45.0",
-    "eslint-plugin-vue": "^8.7.1",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-vue": "^9.15.1",
     "sass": "^1.34.0",
     "typescript": "^4.7.4",
     "vite": "^4.4.6",
-    "vite-plugin-pwa": "^0.16.4"
+    "vite-plugin-pwa": "^0.16.4",
+    "vue-eslint-parser": "^9.3.1"
   }
 }

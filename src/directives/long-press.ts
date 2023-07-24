@@ -6,7 +6,8 @@ export default {
     beforeMount: function (el, binding) {
         el.longPressTimeout = null;
         el._setLongPressTimeout = function (e) {
-            var context = this;
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            const context = this;
 
             el.longPressTimeout = setTimeout(function () {
                 binding.value.call(context, e);
