@@ -16,17 +16,17 @@
         Could not find any items
     </div>
 
-    <div class="list-wrapper" v-else v-bind:class="{ 'editMode': editMode }">
-        <template v-for="section in sections" :key="section.id">
-            <v-lazy v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length">
+    <div class="list-wrapper" v-else :class="{ 'editMode': editMode }">
+        <template v-for="section in sections">
+            <v-lazy :key="section.id" v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length">
                 <v-list v-if="getItemsBySectionId(section.id, !shouldFilterItems()).length" density="compact">
                     <v-divider />
 
                     <v-list-subheader>{{section.value}}</v-list-subheader>
 
-                    <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())" :key="item.id" >
-                        <v-list-item v-if="!item.checked || shouldFilterItems()" v-long-press='function () { editItem(item, section) }'>
-                            <template v-slot:prepend>
+                    <template v-for="item in getItemsBySectionId(section.id, !shouldFilterItems())">
+                        <v-list-item :key="item.id" v-if="!item.checked || shouldFilterItems()" v-long-press='function () { editItem(item, section) }'>
+                            <template #prepend>
                                 <v-list-item-action start>
                                     <v-checkbox-btn color="primary" v-if="editMode" v-model="item.markedForDeletion" @change="toggleSelection(item, section)"></v-checkbox-btn>
                                     <v-checkbox-btn color="primary" v-else v-model="item.checked" @change="toggleSelection(item, section)"></v-checkbox-btn>
@@ -198,7 +198,7 @@
                 return this.editMode || this.completedItems || !!this.searchQuery;
             },
             getItemsBySectionId(sectionId: string, filterCheckedItems: boolean): Item[] {
-                var items = this.filteredItems.length ? this.filteredItems : this.items;
+                const items = this.filteredItems.length ? this.filteredItems : this.items;
 
                 return items.filter(item => {
                     if (filterCheckedItems) {

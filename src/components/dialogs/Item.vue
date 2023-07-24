@@ -11,7 +11,9 @@
 
                 <v-card-text>
                     <v-form v-model="validForm">
-                        <v-combobox required clearable
+                        <v-combobox
+                            required
+                            clearable
                             label="Section *"
                             v-model="section"
                             :rules="notEmptyRule"
@@ -20,7 +22,8 @@
                             item-value="id">
                         </v-combobox>
 
-                        <v-text-field required
+                        <v-text-field
+                            required
                             label="Item *"
                             v-model="item.value"
                             :rules="notEmptyRule"
@@ -72,8 +75,8 @@
                 (v: string) => !!v || 'Please fill in a value'
             ],
             showDialog: true,
-            section: <Section|undefined> undefined,
-            item: <Item> {}
+            section: {} as Section,
+            item: {} as Item
         }),
         methods: {
             confirm(): void {
@@ -102,7 +105,7 @@
                     if (this.section && this.section.id) {
                         return Promise.resolve(this.section.id);
                     } else {
-                        var sectionRef = firebase.firestore().collection('sections');
+                        const sectionRef = firebase.firestore().collection('sections');
 
                         return sectionRef.add({
                             value: this.section
@@ -122,7 +125,7 @@
             },
             getItemData(): void {
                 this.getItemDoc(this.item.id).get().then((doc) => {
-                    var data = doc.data();
+                    const data = doc.data();
 
                     if (data) {
                         this.item = {
@@ -144,9 +147,13 @@
             }
 
             this.getSections().then(() => {
-                this.section = this.sections.find((section) => {
+                const matchingSection = this.sections.find((section) => {
                     return section.id === this.$route.params.sectionId;
                 });
+
+                if (matchingSection) {
+                    this.section = matchingSection;
+                }
             })
         }
     })

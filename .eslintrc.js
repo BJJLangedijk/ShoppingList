@@ -5,12 +5,13 @@ module.exports = {
       es2022: true
     },
     extends: [
-      'plugin:vue/essential',
-      '@vue/airbnb',
-      '@vue/typescript/recommended',
+        "plugin:vue/strongly-recommended",
+        "eslint:recommended",
+        "@vue/typescript/recommended",
+        "prettier",
     ],
     rules: {
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'vue/multi-word-component-names': 'off',
+      'vue/component-definition-name-casing': 'off'
     },
   };
