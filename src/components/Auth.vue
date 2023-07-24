@@ -7,21 +7,27 @@
     </div>
 </template>
 <script lang="ts">
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 
-const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+const googleAuthProvider = new GoogleAuthProvider();
+
+const auth = getAuth();
 
 export default {
     name: 'auth',
     methods: {
-        login() {
-            firebase.auth().signInWithRedirect(googleAuthProvider).then().catch((err) => window.alert(err));
+        async login() {
+            await signInWithRedirect(auth, googleAuthProvider);
+
+            await getRedirectResult(auth).catch((error) => {
+                window.alert(`Login error: ${error.code} ${error.message}`);
+            });
         },
 
         signOut() {
-            firebase.auth().signOut().then(() => {
-            }).catch((err) => window.alert(err));
+            signOut(auth).catch((error) => {
+                window.alert(`Logout error: ${error.code} ${error.message}`);
+            });
         },
     }
 };

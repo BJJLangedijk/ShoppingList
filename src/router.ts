@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 const List = () => import('@/components/List.vue');
 const Item = () => import('@/components/dialogs/Item.vue');
 const Auth = () => import('@/components/Auth.vue');
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -29,7 +28,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const currentUser = firebase.auth().currentUser;
+  const currentUser = getAuth().currentUser;
+
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   if (requiresAuth && !currentUser) {

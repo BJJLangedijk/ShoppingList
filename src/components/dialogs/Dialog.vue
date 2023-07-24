@@ -1,7 +1,6 @@
 <script lang="ts">
+import { collection, getDocsFromCache, getFirestore, orderBy, query } from 'firebase/firestore';
 import { defineComponent } from 'vue';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 
 interface Section {
     id: string;
@@ -22,7 +21,9 @@ export default defineComponent({
         confirm(): void {
         },
         getSections(): Promise<void> {
-            return firebase.firestore().collection('sections').orderBy('value').get().then((collection) => {
+            const sectionsRef = collection(getFirestore(), 'sections');
+
+            return getDocsFromCache(query(sectionsRef, orderBy('value'))).then((collection) => {
                 this.sections = [];
                 collection.forEach((doc) => {
                     this.sections.push({
