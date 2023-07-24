@@ -11,6 +11,9 @@ export default defineConfig({
     loadVersion(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        navigateFallbackDenylist: [/__\/auth/],
+      },
       devOptions: {
         enabled: false
       },
