@@ -1,10 +1,7 @@
 <template>
     <v-app>
         <v-app-bar color="primary">
-            <v-app-bar-title>
-                Shopping List
-                <span class="text-caption">{{ version }}</span>
-            </v-app-bar-title>
+            <v-app-bar-title>Shopping List</v-app-bar-title>
 
             <!-- Maybe there's a better way to match routes -->
             <template v-if="$route.name === 'List'">
