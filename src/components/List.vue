@@ -40,7 +40,7 @@
             </v-lazy>
         </template>
     </div>
-    <template v-if="editMode && Object.keys(selectedItems).length">
+    <template v-if="editMode && selectedItems.length">
 
         <!-- Delete Button -->
         <v-btn
@@ -137,17 +137,16 @@
                 }
             },
             toggleSelection(item: Item, section: Section): void {
-                let itemData;
-
                 if (this.editMode) {
-                    itemData = Object.assign({}, item);
-
-                    itemData.sectionId = section.id;
-
-                    if (item.checked && this.selectedItems[item.id]) {
-                        delete this.selectedItems[item.id];
+                    if (this.selectedItems.some(x => x.id === item.id)) {
+                        this.selectedItems = this.selectedItems.filter((x) => {
+                            return x.id !== item.id;
+                        });
                     } else {
-                        this.selectedItems[item.id] = itemData;
+                        this.selectedItems.push({
+                            ...item,
+                            sectionId: section.id
+                        });
                     }
                 } else {
                     if (item.checked) {
@@ -215,13 +214,9 @@
                 this.$router.push({ name: 'editItem', params: { sectionId: section.id, itemId: item.id }});
             },
             deleteItems() {
-                for (const key in this.selectedItems) {
-                    if (this.selectedItems.hasOwnProperty(key)) {
-                        const item = this.selectedItems[key];
-
-                        firebase.firestore().collection('items').doc(item.id).delete().catch(this.onFirebaseError);
-                    }
-                }
+                this.selectedItems.forEach((item) => {
+                    firebase.firestore().collection('items').doc(item.id).delete().catch(this.onFirebaseError);
+                });
             }
         },
         computed: {
