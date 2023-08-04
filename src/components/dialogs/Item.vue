@@ -73,7 +73,7 @@
                 (v: string) => !!v || 'Please fill in a value'
             ],
             showDialog: true,
-            section: {} as Section,
+            section: {} as Section | undefined,
             item: {} as Item
         }),
         methods: {
@@ -147,9 +147,7 @@
                     return section.id === this.$route.params.sectionId;
                 });
 
-                if (matchingSection) {
-                    this.section = matchingSection;
-                }
+                this.section = matchingSection;
             })
         }
     })
