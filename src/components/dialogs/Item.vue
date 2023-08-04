@@ -101,18 +101,19 @@
 
                 this.item.sectionId = sectionId;
 
+                const data: Record<string, string> = {
+                    sectionId: sectionId,
+                    value: this.item.value,
+                }
+
+                if (this.item.amount) {
+                    data.amount = this.item.amount;
+                }
+
                 if (!this.item.id) {
-                    await addDoc(collection(getFirestore(), 'items'), {
-                        sectionId: sectionId,
-                        amount: this.item.amount,
-                        value: this.item.value,
-                    });
+                    await addDoc(collection(getFirestore(), 'items'), data);
                 } else {
-                    await updateDoc(doc(getFirestore(), 'items', this.item.id), {
-                        sectionId: sectionId,
-                        amount: this.item.amount,
-                        value: this.item.value,
-                    });
+                    await updateDoc(doc(getFirestore(), 'items', this.item.id), data);
                 }
                 this.closeDialog();
             },
