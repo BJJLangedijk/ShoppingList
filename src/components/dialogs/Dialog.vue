@@ -38,9 +38,6 @@ export default defineComponent({
         closeDialog(): void {
             this.$router.back();
         }
-    },
-    beforeMount() {
-        this.getSections();
     }
 });
 </script>
