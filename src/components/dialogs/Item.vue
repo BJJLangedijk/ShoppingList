@@ -2,12 +2,17 @@
     <v-layout row justify-center>
         <v-dialog v-model="showDialog" :fullscreen="shouldBeFullScreen" persistent :max-width="shouldBeFullScreen ? '' : '300px'">
             <v-card>
-                <v-card-title class="headline" v-if="$route.params.sectionId || $route.params.itemId">
-                    Edit Item
-                </v-card-title>
-                <v-card-title class="headline" v-else>
-                    Add an Item
-                </v-card-title>
+                <v-toolbar
+                    dark
+                    color="primary"
+                >
+                    <v-toolbar-title v-if="$route.params.sectionId || $route.params.itemId">
+                        Edit Item
+                    </v-toolbar-title>
+                    <v-toolbar-title v-else>
+                        New Item
+                    </v-toolbar-title>
+                </v-toolbar>
 
                 <v-card-text>
                     <v-form v-model="validForm">
