@@ -18,7 +18,6 @@
                     <v-form v-model="validForm">
                         <v-combobox
                             required
-                            clearable
                             label="Section *"
                             v-model="section"
                             :rules="notEmptyRule"
