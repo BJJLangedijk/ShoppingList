@@ -43,10 +43,12 @@
                     </v-form>
                 </v-card-text>
 
+                <v-divider></v-divider>
                 <v-card-actions>
+                    <v-btn @click="closeDialog()">Cancel</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn @click="closeDialog()">Close</v-btn>
-                    <v-btn @click="confirm()">Save</v-btn>
+                    <v-btn color="red" v-if="$route.params.sectionId || $route.params.itemId" @click="deleteItem()">Delete</v-btn>
+                    <v-btn color="primary" @click="confirm()">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -54,7 +56,7 @@
 </template>
 
 <script lang="ts">
-    import { getFirestore, addDoc, collection, updateDoc, doc, getDocFromCache } from 'firebase/firestore';
+    import { getFirestore, deleteDoc, addDoc, collection, updateDoc, doc, getDocFromCache } from 'firebase/firestore';
     import Dialog from './Dialog.vue';
     import { defineComponent } from '@vue/runtime-core';
 
@@ -120,6 +122,11 @@
                 } else {
                     await updateDoc(doc(getFirestore(), 'items', this.item.id), data);
                 }
+                this.closeDialog();
+            },
+
+            async deleteItem(): Promise<void> {
+                await deleteDoc(doc(getFirestore(), 'items', this.item.id));
                 this.closeDialog();
             },
 
