@@ -5,11 +5,14 @@
 
             <!-- Maybe there's a better way to match routes -->
             <template v-if="$route.name === 'List'">
-                <v-btn icon="mdi-magnify" :variant="`${searchBarActive ? 'elevated': 'text'}`" @click="toggleSearchBar()">
+                <v-btn icon="mdi-magnify" :variant="`${searchBarActive ? 'elevated' : 'text'}`"
+                    @click="toggleSearchBar()">
                 </v-btn>
-                <v-btn icon="mdi-check-all" :variant="`${completedItems ? 'elevated': 'text'}`" :disabled="editMode" @click="toggleCompletedItems()">
+                <v-btn icon="mdi-check-all" :variant="`${showChecked ? 'elevated' : 'text'}`" :disabled="editMode"
+                    @click="toggleShowChecked()">
                 </v-btn>
-                <v-btn icon="mdi-pencil" :variant="`${editMode ? 'elevated': 'text'}`" :disabled="completedItems" @click="toggleEditMode()">
+                <v-btn icon="mdi-pencil" :variant="`${editMode ? 'elevated' : 'text'}`" :disabled="showChecked"
+                    @click="toggleEditMode()">
                 </v-btn>
             </template>
         </v-app-bar>
@@ -22,6 +25,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { mapActions, mapState } from 'pinia';
+import { useSettingsState } from '@/store/settings';
 
 export default defineComponent({
     name: 'App',
@@ -29,35 +34,17 @@ export default defineComponent({
         version: import.meta.env.PACKAGE_VERSION
     }),
     methods: {
-        toggleSearchBar(): void {
-            this.$store.commit('toggleSearchBar');
-
-        },
-        toggleEditMode(): void {
-            this.$store.commit('toggleEditMode');
-
-        },
-        toggleCompletedItems(): void {
-            this.$store.commit('toggleCompletedItems');
-        }
+        ...mapActions(useSettingsState, ['toggleSearchBar', 'toggleEditMode', 'toggleShowChecked']),
     },
     computed: {
-        searchBarActive(): boolean {
-            return this.$store.getters.searchBarActive;
-        },
-        editMode(): boolean {
-            return this.$store.getters.editMode;
-        },
-        completedItems(): boolean {
-            return this.$store.getters.completedItems;
-        }
+        ...mapState(useSettingsState, ['searchBarActive', 'editMode', 'showChecked']),
     },
     beforeMount() {
         onAuthStateChanged(getAuth(), (user) => {
             if (user) {
-                this.$router.replace({name: 'List'});
+                this.$router.replace({ name: 'List' });
             } else {
-                this.$router.replace({name: 'Auth'});
+                this.$router.replace({ name: 'Auth' });
             }
         });
     }
@@ -65,12 +52,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-    body {
-        -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-        user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
-    }
+body {
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently supported by Chrome and Opera */
+}
 </style>

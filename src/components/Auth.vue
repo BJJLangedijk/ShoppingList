@@ -7,7 +7,7 @@
     </div>
 </template>
 <script lang="ts">
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, getRedirectResult, signOut, signInWithPopup } from 'firebase/auth';
 
 const googleAuthProvider = new GoogleAuthProvider();
 
@@ -17,7 +17,7 @@ export default {
     name: 'auth',
     methods: {
         async login() {
-            await signInWithRedirect(auth, googleAuthProvider);
+            await signInWithPopup(auth, googleAuthProvider);
 
             await getRedirectResult(auth).catch((error) => {
                 window.alert(`Login error: ${error.code} ${error.message}`);
@@ -34,18 +34,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20%;
-        text-align: center;
-    }
-    img {
-        margin: 20px 0;
-        width: 33%;
-    }
-    .v-btn {
-        margin: 20px 0;
-    }
+div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20%;
+    text-align: center;
+}
+
+img {
+    margin: 20px 0;
+    width: 33%;
+}
+
+.v-btn {
+    margin: 20px 0;
+}
 </style>
