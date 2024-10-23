@@ -34,18 +34,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20%;
-        text-align: center;
-    }
-    img {
-        margin: 20px 0;
-        width: 33%;
-    }
-    .v-btn {
-        margin: 20px 0;
-    }
+div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20%;
+    text-align: center;
+}
+
+img {
+    margin: 20px 0;
+    width: 33%;
+}
+
+.v-btn {
+    margin: 20px 0;
+}
 </style>

@@ -17,8 +17,8 @@ const router = createRouter({
             name: 'List',
             component: List,
             children: [
-                {path: '/add', component: Item, name: 'addItem'},
-                {path: '/edit/section/:sectionId/item/:itemId', component: Item, name: 'editItem'}
+                { path: '/add', component: Item, name: 'addItem' },
+                { path: '/edit/section/:sectionId/item/:itemId', component: Item, name: 'editItem' }
             ],
             meta: {
                 requiresAuth: true
@@ -28,15 +28,15 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const currentUser = getAuth().currentUser;
+    const currentUser = getAuth().currentUser;
 
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-  if (requiresAuth && !currentUser) {
-      next({name: 'Auth'});
-  } else {
-      next();
-  }
+    if (requiresAuth && !currentUser) {
+        next({ name: 'Auth' });
+    } else {
+        next();
+    }
 });
 
 export default router;

@@ -11,10 +11,10 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "firebase": "^11.0.1",
+    "pinia": "^2.2.4",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5",
-    "vuetify": "^3.7.3",
-    "vuex": "^4.1.0"
+    "vuetify": "^3.7.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.2.0",
