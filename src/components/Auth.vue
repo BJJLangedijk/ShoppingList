@@ -7,7 +7,7 @@
     </div>
 </template>
 <script lang="ts">
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, getRedirectResult, signOut, signInWithPopup } from 'firebase/auth';
 
 const googleAuthProvider = new GoogleAuthProvider();
 
@@ -17,7 +17,7 @@ export default {
     name: 'auth',
     methods: {
         async login() {
-            await signInWithRedirect(auth, googleAuthProvider);
+            await signInWithPopup(auth, googleAuthProvider);
 
             await getRedirectResult(auth).catch((error) => {
                 window.alert(`Login error: ${error.code} ${error.message}`);
